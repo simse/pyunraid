@@ -1,0 +1,4 @@
+class InvalidCredentials(Exception):
+    pass
+
+
