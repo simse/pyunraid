@@ -1,7 +1,16 @@
 from pyunraid.unraid import Unraid
 
-PASSWORD = 'EIido1YRp,Xe}N+eQdw1>Pw=nF6-eN5Bz)Tx>.u9^^k3nt)=Y%.U}AYlU>9?fduU'
+PASSWORD = 'hotfla123As'
 
-u = Unraid('http://192.168.0.42', 'root', PASSWORD)
+u = Unraid('http://192.168.0.4', 'root', PASSWORD)
 
-print(u.disks())
+#print(u.vms())
+
+obj = u.vms()[0]
+
+for attr in dir(obj):
+   if hasattr( obj, attr ):
+       if(attr.startswith('__')):
+           continue
+
+       print( "obj.%s = %s" % (attr, getattr(obj, attr)))

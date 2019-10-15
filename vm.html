@@ -1,0 +1,35 @@
+<tr parent-id='0' class='sortable'>
+    <td class='vm-name' style='width:220px;padding:8px'><span class='outer'><span id='vm-33cd1824-9134-6f64-c54c-c997cd609bf5' class='hand'><img src='/plugins/dynamix.vm.manager/templates/images/ubuntu.png' class='img'></span><span class='inner'><a href='#' onclick='return toggle_id("name-0")' title='click for more VM info'>CapRover</a><br><i class='fa fa-play started green-text'></i><span class='state'>started</span></span>
+        </span>
+    </td>
+    <td></td>
+    <td><a class='vcpu-33cd1824-9134-6f64-c54c-c997cd609bf5' style='cursor:pointer'>4</a></td>
+    <td>2048M</td>
+    <td title='Current physical size: 8G'>1 / 50G</td>
+    <td>VNC:5900</td>
+    <td>
+        <input class='autostart' type='checkbox' name='auto_CapRover' title='Toggle VM auostart' uuid='33cd1824-9134-6f64-c54c-c997cd609bf5' checked>
+    </td>
+</tr>
+<tr child-id='0' id='name-0' style='display:none'>
+    <td colspan='7' style='overflow:hidden'>
+        <table class='tablesorter domdisk' id='domdisk_table'>
+            <thead>
+                <tr>
+                    <th><i class='fa fa-hdd-o'></i> <b>Disk devices</b></th>
+                    <th>Bus</th>
+                    <th>Capacity</th>
+                    <th>Allocation</th>
+                </tr>
+            </thead>
+            <tbody id='domdisk_list'>
+                <tr>
+                    <td>/mnt/user/domains/CapRover/vdisk1.img</td>
+                    <td>VirtIO</td>
+                    <td>50G</td>
+                    <td>49G</td>
+                </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>

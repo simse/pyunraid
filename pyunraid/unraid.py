@@ -2,6 +2,7 @@ from pyunraid.helpers import *
 from pyunraid.exceptions import *
 from pyunraid.disks import disks
 from pyunraid.containers import containers
+from pyunraid.vms import vms
 
 
 class Unraid:
@@ -25,3 +26,7 @@ class Unraid:
 
     def containers(self):
         return containers(self.u)
+
+
+    def vms(self):
+        return vms(self.u)
