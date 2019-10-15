@@ -33,9 +33,8 @@ def parse_devices(u, device):
 
 def parse_disk_row(row):
     # Create disk object
-    disk = {
-        "disk_type": "hdd",
-    }
+    disk = Disk()
+    disk.disk_type = "hdd"
 
     # Remove empty rows
     if row.get_text() is '':
@@ -60,70 +59,70 @@ def parse_disk_row(row):
     }
 
     try:
-        disk['status'] = status[status_span]
+        disk.status = status[status_span]
     except KeyError:
-        disk['status'] = None
+        disk.status = None
 
     # Find disk name
     name_a = row.find_all('a')[1]
-    disk['name'] = name_a.get_text()
+    disk.name= name_a.get_text()
 
     # Find storage type
-    if disk['name'] == 'Parity':
-        disk['type'] = 'parity'
-    elif disk['name'] == 'Cache':
-        disk['type'] = 'cache'
-    elif disk['name'] == 'Flash':
-        disk['type'] = 'boot'
+    if disk.name == 'Parity':
+        disk.type = 'parity'
+    elif disk.name == 'Cache':
+        disk.type = 'cache'
+    elif disk.name == 'Flash':
+        disk.type = 'boot'
     else:
-        disk['type'] = 'storage'
+        disk.type = 'storage'
 
     # Find disk identification, size and mount
     id_td = row.find_all('td')[1]
     info = id_td.get_text()
-    disk['identification'] = info.split(' - ')[0]
+    disk.identification = info.split(' - ')[0]
 
-    disk['mount'] = re.search('[(]([a-z]{3})[)]', info).group(0).strip('()')
+    disk.mount = re.search('[(]([a-z]{3})[)]', info).group(0).strip('()')
 
     size = re.search('([0-9]+) (PB|TB|GB|MB)', info)
-    disk['size'] = parse_size(size.group(0))
+    disk.size = parse_size(size.group(0))
 
     # Find disk temperature
     temp_td = row.find_all('td')[2].get_text()
     if temp_td == '*':
-        disk['temperature'] = None
+        disk.temperature = None
     else:
-        disk['temperature'] = int(temp_td.strip(' C'))
+        disk.temperature = int(temp_td.strip(' C'))
 
 
     # Find disk read statistics
     read_td = row.find_all('td')[3]
-    disk['current_read_speed'] = parse_speed(read_td.find_all('span')[0].get_text())
-    disk['current_read_count'] = int(read_td.find_all('span')[1].get_text().replace(',', ''))
+    disk.current_read_speed = parse_speed(read_td.find_all('span')[0].get_text())
+    disk.current_read_count = int(read_td.find_all('span')[1].get_text().replace(',', ''))
 
     # Find disk write statistics
     read_td = row.find_all('td')[4]
-    disk['current_write_speed'] = parse_speed(read_td.find_all('span')[0].get_text())
-    disk['current_write_count'] = int(read_td.find_all('span')[1].get_text().replace(',', ''))
+    disk.current_write_speed = parse_speed(read_td.find_all('span')[0].get_text())
+    disk.current_write_count = int(read_td.find_all('span')[1].get_text().replace(',', ''))
 
     # Find disk errors
     error_td = row.find_all('td')[5]
-    disk['errors'] = int(error_td.get_text())
+    disk.errors = int(error_td.get_text())
 
     # Find filesystem
-    if disk['type'] == 'parity':
-        disk['filesystem'] = None
+    if disk.type == 'parity':
+        disk.filesystem = None
     else:
         fs_td = row.find_all('td')[6]
-        disk['filesystem'] = fs_td.get_text()
+        disk.filesystem = fs_td.get_text()
 
     # Find space used and available
-    if disk['type'] == 'parity':
-        disk['space_used'] = None
-        disk['space_available'] = None
+    if disk.type == 'parity':
+        disk.space_used = None
+        disk.space_available = None
     else:
-        disk['space_used'] = parse_size(row.find_all('td')[8].get_text())
-        disk['space_available'] = parse_size(row.find_all('td')[9].get_text())
+        disk.space_used = parse_size(row.find_all('td')[8].get_text())
+        disk.space_available = parse_size(row.find_all('td')[9].get_text())
 
     # Add disk object to disks list
     return disk

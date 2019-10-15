@@ -1,6 +1,6 @@
 class Disk():
 
-    def __init__():
+    def __init__(self):
         self.disk_type = ''
         self.status = ''
         self.name = ''
@@ -17,4 +17,3 @@ class Disk():
         self.filesystem = ''
         self.space_used = 0
         self.space_available = 0
-        
