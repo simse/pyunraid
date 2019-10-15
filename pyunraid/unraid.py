@@ -1,6 +1,7 @@
 from pyunraid.helpers import *
 from pyunraid.exceptions import *
 from pyunraid.disks import disks
+from pyunraid.containers import containers
 
 
 class Unraid:
@@ -10,9 +11,17 @@ class Unraid:
         self.password = password
         self.csfr_token = get_csfr_token(url, username, password)
 
-        self.u = [username,
-                  password,
-                  self.csfr_token]
+        self.u = {
+            'url': url,
+            'username': username,
+            'password': password,
+            'csfr_token': self.csfr_token
+        }
+
 
     def disks(self):
-        return disks(self.url, self.u)
+        return disks(self.u)
+
+
+    def containers(self):
+        return containers(self.u)

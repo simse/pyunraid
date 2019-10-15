@@ -3,21 +3,22 @@ from bs4 import BeautifulSoup
 
 from pyunraid.helpers import *
 from pyunraid.constants import *
+from pyunraid.models.disk import Disk
 
 
-def disks(url, u):
-    url = url + '/webGui/include/DeviceList.php'
+def disks(u):
+    u['url'] += '/webGui/include/DeviceList.php'
 
-    return parse_devices(u, url, 'array') + parse_devices(u, url, 'cache') + parse_devices(u, url, 'flash')
+    return parse_devices(u, 'array') + parse_devices(u, 'cache') + parse_devices(u, 'flash')
 
 
-def parse_devices(u, url, device):
+def parse_devices(u, device):
     payload = {
         'path': 'Main',
         'device': device
     }
 
-    parsed_page = BeautifulSoup(post(url, payload, u).text, features="lxml")
+    parsed_page = BeautifulSoup(post(u, payload).text, features="lxml")
     rows = parsed_page.find_all('tr')
     disks = []
 
