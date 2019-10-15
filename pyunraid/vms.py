@@ -23,6 +23,9 @@ def parse_vms(u):
     for vm_row in soup.find_all(class_="sortable"):
         vm = VM()
 
+        # Find VM uuid
+        vm.uuid = vm_row.find_all('td')[6].find_all("input")[0]['uuid']
+
         # Find VM name
         vm.name = vm_row.select(".vm-name a")[0].text
 

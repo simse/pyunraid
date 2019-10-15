@@ -1,6 +1,7 @@
 class VM:
 
     def __init__(self):
+        self.uuid = ''
         self.name = ''
         self.description = ''
         self.cpu_count = 0
