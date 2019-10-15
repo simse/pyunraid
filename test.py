@@ -6,7 +6,9 @@ u = Unraid('http://192.168.0.4', 'root', PASSWORD)
 
 #print(u.vms())
 
-obj = u.vms()[0]
+obj = u.vms()[1]
+
+obj.force_stop()
 
 for attr in dir(obj):
    if hasattr( obj, attr ):

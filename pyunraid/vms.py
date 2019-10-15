@@ -50,6 +50,10 @@ def parse_vms(u):
         # Find autostart status
         vm.autostart = vm_row.find_all('td')[6].find_all("input")[0].has_attr('checked')
 
+
+        u['url'] = u['url'].replace('/plugins/dynamix.vm.manager/include/VMMachines.php', '')
+        vm.unraid = u
+
         vms.append(vm)
 
     return vms
