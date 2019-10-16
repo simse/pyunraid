@@ -7,7 +7,7 @@ class Share():
         self.comment = ''
         self.smb_security = ''
         self.nfs_security = ''
-        self.afp_security = ''
+        self.afp_security = None
         self.free_size = 0
 
 

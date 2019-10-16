@@ -48,9 +48,6 @@ def parse_shares(unraid):
         # Find SMB security
         s.nfs_security = SHARE_SECURITY[share.find_all('td')[3].text]
 
-        # Find SMB security
-        s.afp_security = SHARE_SECURITY[share.find_all('td')[4].text]
-
         # Find free space
         s.free_size = parse_size(share.find_all('td')[6].text)
 

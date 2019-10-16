@@ -8,6 +8,8 @@ from pyunraid.users import users
 
 
 class Unraid:
+    SUPPORTED_VERSIONS = ['6.7.2']
+
     def __init__(self, url, username='root', password=''):
         self.url = url
         self.username = username,
