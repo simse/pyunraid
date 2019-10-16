@@ -20,13 +20,21 @@ class Unraid:
         }
 
 
+    def get(self, url):
+        return get(self.u, self.u['url'] + url)
+
+
+    def post(self, url, payload):
+        return post(self.u, self.u['url'] + url, payload)
+
+
     def disks(self):
-        return disks(self.u)
+        return disks(self)
 
 
     def containers(self):
-        return containers(self.u)
+        return containers(self)
 
 
     def vms(self):
-        return vms(self.u)
+        return vms(self)

@@ -9,14 +9,13 @@ from pyunraid.models.vm import VM
 
 
 def vms(u):
-    u['url'] += '/plugins/dynamix.vm.manager/include/VMMachines.php'
 
     return parse_vms(u)
 
 
 def parse_vms(u):
     # Parse containers page
-    soup = BeautifulSoup(get(u).text, 'lxml')
+    soup = BeautifulSoup(u.get('/plugins/dynamix.vm.manager/include/VMMachines.php').text, 'lxml')
     vms = []
 
     # Loop through each VM
@@ -50,8 +49,6 @@ def parse_vms(u):
         # Find autostart status
         vm.autostart = vm_row.find_all('td')[6].find_all("input")[0].has_attr('checked')
 
-
-        u['url'] = u['url'].replace('/plugins/dynamix.vm.manager/include/VMMachines.php', '')
         vm.unraid = u
 
         vms.append(vm)

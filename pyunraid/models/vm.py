@@ -54,15 +54,13 @@ class VM:
     def _domain(self, action, payload = {}):
         unraid = self.unraid
 
-        unraid['url'] += '/plugins/dynamix.vm.manager/include/VMajax.php'
-
         payload = {**{
             'action': action,
             'uuid': self.uuid,
             'response': 'json'
         }, **payload}
 
-        response_code = post(unraid, payload).status_code
+        response_code = unraid.post('/plugins/dynamix.vm.manager/include/VMajax.php', payload).status_code
 
         if response_code == 200:
             return 'OK'

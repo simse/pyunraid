@@ -9,14 +9,13 @@ from pyunraid.models.container import Container
 
 
 def containers(u):
-    u['url'] += '/plugins/dynamix.docker.manager/include/DockerContainers.php'
 
     return parse_containers(u)
 
 
 def parse_containers(u):
     # Parse containers page
-    soup = BeautifulSoup(get(u).text, 'lxml')
+    soup = BeautifulSoup(u.get('/plugins/dynamix.docker.manager/include/DockerContainers.php').text, 'lxml')
     containers = []
 
     # Loop through each table row
@@ -107,7 +106,6 @@ def parse_containers(u):
         c.dockerhub_url = container.find_all('a')[1]['href']
 
         c.unraid = u
-        c.unraid['url'] = u['url'].replace('/plugins/dynamix.docker.manager/include/DockerContainers.php', '')
 
         containers.append(c)
 

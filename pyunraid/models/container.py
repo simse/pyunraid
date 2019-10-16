@@ -55,8 +55,6 @@ class Container():
     def _action(self, action, payload = {}):
         unraid = self.unraid
 
-        unraid['url'] += '/plugins/dynamix.docker.manager/include/Events.php'
-
         payload = {**{
             'action': action,
             'container': self.id,
@@ -64,7 +62,7 @@ class Container():
             'response': 'json'
         }, **payload}
 
-        response_code = post(unraid, payload).status_code
+        response_code = unraid.post('/plugins/dynamix.docker.manager/include/Events.php', payload).status_code
 
         if response_code == 200:
             return 'OK'

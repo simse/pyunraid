@@ -20,18 +20,17 @@ def get_csfr_token(url, username, password):
     return csfr_token
 
 
-def get(u):
+def get(u, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    #payload['csrf_token'] = u['csfr_token']
-    request = requests.get(u['url'], headers=headers, auth=(u['username'], u['password']))
+    request = requests.get(url, headers=headers, auth=(u['username'], u['password']))
 
     return request
 
 
-def post(u, payload):
+def post(u, url, payload):
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     payload['csrf_token'] = u['csfr_token']
-    request = requests.post(u['url'], data=payload, headers=headers, auth=(u['username'], u['password']))
+    request = requests.post(url, data=payload, headers=headers, auth=(u['username'], u['password']))
 
     return request
 

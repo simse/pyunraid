@@ -8,7 +8,9 @@ u = Unraid('http://192.168.0.4', 'root', PASSWORD)
 
 obj = u.vms()[1]
 
-obj.force_stop()
+#obj.destroy()
+
+
 
 for attr in dir(obj):
    if hasattr( obj, attr ):
