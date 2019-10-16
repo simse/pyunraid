@@ -7,18 +7,17 @@ from pyunraid.models.disk import Disk
 
 
 def disks(u):
-    u['url'] += '/webGui/include/DeviceList.php'
 
     return parse_devices(u, 'array') + parse_devices(u, 'cache') + parse_devices(u, 'flash')
 
 
-def parse_devices(u, device):
+def parse_devices(unraid, device):
     payload = {
         'path': 'Main',
         'device': device
     }
 
-    parsed_page = BeautifulSoup(post(u, payload).text, features="lxml")
+    parsed_page = BeautifulSoup(unraid.post('/webGui/include/DeviceList.php', payload).text, features="lxml")
     rows = parsed_page.find_all('tr')
     disks = []
 
