@@ -4,6 +4,7 @@ from pyunraid.disks import disks
 from pyunraid.containers import containers
 from pyunraid.vms import vms
 from pyunraid.shares import shares
+from pyunraid.users import users
 
 
 class Unraid:
@@ -43,3 +44,7 @@ class Unraid:
 
     def shares(self):
         return shares(self)
+
+
+    def users(self):
+        return users(self)
