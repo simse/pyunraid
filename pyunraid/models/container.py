@@ -14,8 +14,6 @@ class Container():
         self.network = ''
         self.port_mappings = []
         self.path_mappings = []
-        self.cpu_usage = 0
-        self.memory_usage = 0
         self.startup_delay = 0
         self.uptime = 0
         self.age = 0
@@ -35,7 +33,17 @@ class Container():
 
 
     def disable_autostart(self):
-        return self._action('')
+        return self._action('autostart',
+            {'auto':'false', 'container':self.name, 'wait':''},
+            '/plugins/dynamix.docker.manager/include/UpdateConfig.php'
+        )
+
+
+    def enable_autostart(self):
+        return self._action('autostart',
+            {'auto':'true', 'container':self.name, 'wait':''},
+            '/plugins/dynamix.docker.manager/include/UpdateConfig.php'
+        )
 
 
     def remove(self, remove_image=False):
@@ -52,7 +60,7 @@ class Container():
         pass
 
     # Internal functions
-    def _action(self, action, payload = {}):
+    def _action(self, action, payload = {}, url = '/plugins/dynamix.docker.manager/include/Events.php'):
         unraid = self.unraid
 
         payload = {**{
@@ -62,7 +70,9 @@ class Container():
             'response': 'json'
         }, **payload}
 
-        response_code = unraid.post('/plugins/dynamix.docker.manager/include/Events.php', payload).status_code
+        print(payload)
+
+        response_code = unraid.post(url, payload).status_code
 
         if response_code == 200:
             return 'OK'

@@ -1,7 +1,9 @@
 import re
+import datetime
 
 import requests
 from bs4 import BeautifulSoup
+from timefhuman import timefhuman
 
 from pyunraid.helpers import *
 from pyunraid.constants import *
@@ -81,23 +83,30 @@ def parse_containers(u):
         # Find startup delay
         c.startup_delay = container.find_all('td')[6].find_all('input')[1]['value']
 
+        if not c.startup_delay:
+            c.startup_delay = 0
+
         # Find uptime
-        uptime = re.search(r'Uptime ([0-9]{1,3})', \
+        uptime = re.search(r'Uptime ([0-9]{1,3}) (hours|days|weeks)', \
             container.find_all('td')[7].find_all('div')[0].text)
 
         if not uptime:
             c.uptime = 0
         else:
-            c.uptime = uptime[0].replace('Uptime ', '')
+            match = uptime[0].replace('Uptime ', '')
+
+            c.uptime = _human_to_machine_time(match)
 
         # Find age
-        age = re.search(r'Created ([0-9]{1,3})', \
+        age = re.search(r'Created ([0-9]{1,3}) (hours|days|weeks)', \
             container.find_all('td')[7].find_all('div')[1].text)
 
         if not age:
             c.age = 0
         else:
-            c.age = age[0].replace('Created ', '')
+            match = age[0].replace('Created ', '')
+
+            c.age = _human_to_machine_time(match)
 
         # Find container image
         c.image = container.find('img')['src']
@@ -111,3 +120,19 @@ def parse_containers(u):
 
 
     return containers
+
+
+def _human_to_machine_time(input):
+    if 'hours' in input:
+        return int(input.replace(' hours', ''))
+
+    if 'days' in input:
+        return int(input.replace(' days', '')) * 24
+
+    if 'weeks' in input:
+        return int(input.replace(' weeks', '')) * 24 * 7
+
+    if 'months' in input:
+        return int(input.replace(' months', '')) * 24 * 7 * 30
+
+    return 0
