@@ -3,6 +3,7 @@ from pyunraid.exceptions import *
 from pyunraid.disks import disks
 from pyunraid.containers import containers
 from pyunraid.vms import vms
+from pyunraid.shares import shares
 
 
 class Unraid:
@@ -38,3 +39,7 @@ class Unraid:
 
     def vms(self):
         return vms(self)
+
+
+    def shares(self):
+        return shares(self)
