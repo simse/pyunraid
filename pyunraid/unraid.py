@@ -5,6 +5,7 @@ from pyunraid.containers import containers
 from pyunraid.vms import vms
 from pyunraid.shares import shares
 from pyunraid.users import users
+from pyunraid.plugins import plugins
 
 
 class Unraid:
@@ -50,3 +51,7 @@ class Unraid:
 
     def users(self):
         return users(self)
+
+
+    def plugins(self):
+        return plugins(self)
