@@ -20,7 +20,7 @@ def parse_containers(u):
     containers = []
 
     # Loop through each table row
-    for container in soup.find_all('tr'):
+    for container in soup.select('tr.sortable'):
         c = Container()
 
         # Get container name
@@ -106,6 +106,8 @@ def parse_containers(u):
         # Find Dockerhub url
         c.dockerhub_url = container.find_all('a')[1]['href']
 
+        c.unraid = u
+        c.unraid['url'] = u['url'].replace('/plugins/dynamix.docker.manager/include/DockerContainers.php', '')
 
         containers.append(c)
 
