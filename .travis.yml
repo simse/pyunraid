@@ -9,7 +9,7 @@ script:
 deploy:
   provider: pypi
   twine_version: 1.12.1
-  user: simsemand
+  user: __token__
   password:
     secure: f5DtQT5yeuSD0SH5FyXMBpd/HF9Pm/sUxHOQoykhU0BKymA4tSkdzCGgOZPvEWItCuhYUDnyp9+IprVtD/uUvF5cDKu4inDD8FnRPWrwvZ3RwsVtgmZjgJmLVY/iLq6ltEVQlSAZ7eI+RmvMnt89Fs+se40yKJqkETIYDYDf2VIEeALO4hL02za2tOdSBbP4brSnC2IKUGcuzAMZ8S7QCrOOlKGk8MljRlkSFuMp7GADXLU5AN0cNoVOw/3DCSxAVSw+SOk87T3CP9FLumxsGHG6J5/V0rUluJRMHHfS+Iq1V46SonGeR2kYvi5clu2tBGrZjkzYdywnUeatOt69J0vjypLQX477JAPZvporbx8+P97UknVCmsq9vZ096a6IER8Y+s85Npd8fomOWpgFGo5kaLrStMnAV1TXUSIl+X4WN6jpgMFlXAdaNBIw3CCdMwWWe+gwV8X1/lXwcwm8RM1xTVdgbtG6BZYzK2BHLDDlgATRY4rR5gN1XDJoZkfozmHB9BB/fpK4YuM1p+2sN3Wmt/5V/lkwi0kUh8SdhZe9e/9Qe8X451/TX+lETeoXWbcVpNtX2tTf5AK7zgSpjEMH3Ul1QUMEnzdXdHZbzTGNWuzH7YZDIkq85fs2nxaWOdvIuJE0PZ91CWleRic/9TLdAs79MFWxa0204SIAtyw=
   skip_existing: true
