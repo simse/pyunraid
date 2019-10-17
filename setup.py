@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
   name = 'pyunraid',         # How you named your package folder (MyLib)
   packages = setuptools.find_packages(),   # Chose the same as "name"
-  version = '0.3.0',      # Start with a small number and increase it with every change you make
+  version = '0.3.1',      # Start with a small number and increase it with every change you make
   license='GNU GPLv3',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'A Python library to interface directly with Unraid servers',   # Give a short description about your library
   author = 'Simon Sorensen',                   # Type in your name
@@ -13,6 +13,7 @@ setup(
   install_requires=[            # I get to this in a second
           'requests',
           'beautifulsoup4',
+          'timefhuman'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
