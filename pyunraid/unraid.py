@@ -10,6 +10,7 @@ from pyunraid.vms import vms
 from pyunraid.shares import shares
 from pyunraid.users import users
 from pyunraid.plugins import plugins
+from pyunraid.notifications import notifications
 
 
 class Unraid:
@@ -49,7 +50,7 @@ class Unraid:
         return get(self.u, self.u['url'] + url)
 
 
-    def post(self, url, payload):
+    def post(self, url, payload={}):
         return post(self.u, self.u['url'] + url, payload)
 
 
@@ -111,5 +112,12 @@ class Unraid:
     def plugins(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
-            
+
         return plugins(self)
+
+
+    def notifications(self):
+        if self.array_status in ['STOPPING', 'STOPPED']:
+            return []
+
+        return notifications(self)

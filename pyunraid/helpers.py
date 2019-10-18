@@ -27,7 +27,7 @@ def get(u, url):
     return request
 
 
-def post(u, url, payload):
+def post(u, url, payload={}):
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     payload['csrf_token'] = u['csfr_token']
     request = requests.post(url, data=payload, headers=headers, auth=(u['username'], u['password']))
