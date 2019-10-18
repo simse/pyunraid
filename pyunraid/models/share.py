@@ -37,3 +37,34 @@ class Share():
         :rtype: list
         """
         pass
+
+
+    def rename():
+        pass
+
+    def comment():
+        pass
+
+    def allocation_method():
+        pass
+
+    def minimum_free_space():
+        pass
+
+    def split_level():
+        pass
+
+    def included_disks():
+        pass
+
+    def excluded_disks():
+        pass
+
+    def use_cache_disk():
+        pass
+
+    def export(protocol):
+        pass
+
+    def security(protocol, security):
+        pass

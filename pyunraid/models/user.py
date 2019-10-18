@@ -10,3 +10,18 @@ class User():
         self.name = ''
         self.description = ''
         self.image = ''
+
+    def rename(self):
+        pass
+
+    def description():
+        pass
+
+    def image():
+        pass
+
+    def delete():
+        pass
+
+    def set_password():
+        pass

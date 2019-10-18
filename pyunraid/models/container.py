@@ -86,6 +86,11 @@ class Container():
         """Loads container logs."""
         pass
 
+
+    # TODO: Update container
+    def _update(self):
+        pass
+
     # Internal functions
     def _action(self, action, payload = {}, url = '/plugins/dynamix.docker.manager/include/Events.php'):
         unraid = self.unraid

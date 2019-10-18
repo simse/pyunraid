@@ -39,3 +39,11 @@ class Disk():
 
     def _smart():
         pass
+
+
+    def _logs():
+        pass
+
+
+    def _identity():
+        pass
