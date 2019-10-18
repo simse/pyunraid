@@ -1,0 +1,963 @@
+<html lang="en"><head>
+<title>Proton/Main</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1440">
+<meta name="robots" content="noindex, nofollow">
+<link type="image/png" rel="shortcut icon" href="/webGui/images/yellow-on.png">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/default-fonts.css?v=1561638631">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/default-cases.css?v=1561638631">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/font-awesome.css?v=1561638631">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/context.standalone.css?v=1561638631">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.sweetalert.css?v=1561638631">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/default-white.css?v=1561638631">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/dynamix-white.css?v=1561638631">
+
+<style>
+html{font-size:68.75%}
+.inline_help{display:none}
+.upgrade_notice{position:fixed;top:1px;left:0;width:100%;height:40px;line-height:40px;color:#e68a00;background:#feefb3;border-bottom:#e68a00 1px solid;text-align:center;font-size:1.4rem;z-index:999}
+.upgrade_notice i{margin:14px;float:right;cursor:pointer}
+.back_to_top{display:none;position:fixed;bottom:30px;right:12px;color:#e22828;font-size:2.5rem;z-index:999}
+#header.image{background-image:url(/webGui/images/banner.png)}
+</style>
+
+<script src="/webGui/javascript/dynamix.js?v=1561638631"></script><style rel="alternate stylesheet" type="text/css"></style>
+<script>
+Shadowbox.init({skipSetup:true});
+
+// server uptime
+var uptime = 879315.62;
+var expiretime = 0;
+var before = new Date();
+
+// page timer events
+var timers = {};
+
+function pauseEvents(id){
+  $.each(timers, function(i, timer) {
+    if (!id || i==id) clearTimeout(timer);
+  });
+}
+function resumeEvents(id,delay){
+  var startDelay = delay||50;
+  $.each(timers, function(i, timer) {
+    if (!id || i==id) timers[i] = setTimeout(i+'()', startDelay);
+    startDelay += 50;
+  });
+}
+function plus(value, label, last) {
+  return value>0 ? (value+' '+label+(value!=1?'s':'')+(last?'':', ')) : '';
+}
+function updateTime() {
+  var now = new Date();
+  var days = parseInt(uptime/86400);
+  var hour = parseInt(uptime/3600%24);
+  var mins = parseInt(uptime/60%60);
+  $('span.uptime').html(((days|hour|mins)?plus(days,'day',(hour|mins)==0)+plus(hour,'hour',mins==0)+plus(mins,'minute',true):'less than a minute'));
+  uptime += Math.round((now.getTime() - before.getTime())/1000);
+  before = now;
+  if (expiretime > 0) {
+    var remainingtime = expiretime - now.getTime()/1000;
+    if (remainingtime > 0) {
+      days = parseInt(remainingtime/86400);
+      hour = parseInt(remainingtime/3600%24);
+      mins = parseInt(remainingtime/60%60);
+      if (days) {
+        $('#licenseexpire').html(plus(days,'day',true)+' remaining');
+      } else if (hour) {
+        $('#licenseexpire').html(plus(hour,'hour',true)+' remaining').addClass('orange-text');
+      } else if (mins) {
+        $('#licenseexpire').html(plus(mins,'minute',true)+' remaining').addClass('red-text');
+      } else {
+        $('#licenseexpire').html('less than a minute remaining').addClass('red-text');
+      }
+    } else {
+      $('#licenseexpire').addClass('red-text');
+    }
+  }
+  setTimeout(updateTime,1000);
+}
+function refresh(top) {
+  if (typeof top === 'undefined') {
+    for (var i=0,element; element=document.querySelectorAll('input,button,select')[i]; i++) { element.disabled = true; }
+    for (var i=0,link; link=document.getElementsByTagName('a')[i]; i++) { link.style.color = "gray"; } //fake disable
+    location = location;
+  } else {
+    $.cookie('top',top,{path:'/'});
+    location = location;
+  }
+}
+function initab() {
+  $.removeCookie('one',{path:'/'});
+  $.removeCookie('tab',{path:'/'});
+}
+function settab(tab) {
+  $.cookie('tab',tab,{path:'/'});
+  $.cookie('one','tab1',{path:'/'});
+}
+function done(key) {
+  var url = location.pathname.split('/');
+  var path = '/'+url[1];
+  if (key) for (var i=2; i<url.length; i++) if (url[i]==key) break; else path += '/'+url[i];
+  $.removeCookie('one',{path:'/'});
+  location.replace(path);
+}
+function chkDelete(form, button) {
+  button.value = form.confirmDelete.checked ? 'Delete' : 'Apply';
+  button.disabled = false;
+}
+function openBox(cmd,title,height,width,load,func,id) {
+  // open shadowbox window (run in foreground)
+  var run = cmd.split('?')[0].substr(-4)=='.php' ? cmd : '/logging.htm?cmd='+cmd+'&csrf_token=1D84AB24441EAF74';
+  var options = load ? (func ? {modal:true,onClose:function(){setTimeout(func+'('+'"'+(id||'')+'")',0);}} : {modal:true,onClose:function(){location=location;}}) : {modal:true};
+  Shadowbox.open({content:run, player:'iframe', title:title, height:Math.min(height,screen.availHeight), width:Math.min(width,screen.availWidth), options:options});
+}
+function openWindow(cmd,title,height,width) {
+  // open regular window (run in background)
+  var window_name = title.replace(/ /g,"_");
+  var form_html =
+  '<form action="/logging.htm" method="post" target="' + window_name + '">' +
+  '<input type="hidden" name="csrf_token" value="1D84AB24441EAF74" />' +
+  '<input type="hidden" name="title" value="' + title + '" />';
+  var vars = cmd.split('&');
+  form_html += '<input type="hidden" name="cmd" value="' + vars[0] + '" />';
+  for (var i = 1; i < vars.length; i++) {
+    var pair = vars[i].split('=');
+    form_html += '<input type="hidden" name="' + pair[0] + '" value="' + pair[1] + '" />';
+  }
+  form_html += '</form>';
+  var form = $(form_html);
+  $('body').append(form);
+  var top = (screen.availHeight-height)/2;
+  if (top < 0) {top = 0; height = screen.availHeight;}
+  var left = (screen.availWidth-width)/2;
+  if (left < 0) {left = 0; width = screen.availWidth;}
+  var options = 'resizeable=yes,scrollbars=yes,height='+height+',width='+width+',top='+top+',left='+left;
+  window.open('', window_name, options);
+  form.submit();
+}
+function showStatus(name,plugin,job) {
+  $.post('/webGui/include/ProcessStatus.php',{name:name,plugin:plugin,job:job},function(status){$(".tabs").append(status);});
+}
+function showFooter(data, id) {
+  if (id !== undefined) $('#'+id).remove();
+  $('#copyright').prepend(data);
+}
+function showNotice(data) {
+  $('#user-notice').html(data.replace(/<a>(.*)<\/a>/,"<a href='/Plugins'>$1</a>"));
+}
+function showUpgrade(data) {
+  if ($.cookie('os_upgrade')==null)
+    $('.upgrade_notice').html(data.replace(/<a>(.*)<\/a>/,"<a href='#' onclick='hideUpgrade();openUpgrade()'>$1</a>")+"<i class='fa fa-close' title='Close' onclick='hideUpgrade(true)'></i>").show();
+}
+function hideUpgrade(set) {
+  $('.upgrade_notice').hide();
+  if (set)
+    $.cookie('os_upgrade','true',{path:'/'});
+  else
+    $.removeCookie('os_upgrade',{path:'/'});
+}
+function openUpgrade() {
+  swal({title:'Update Unraid OS',text:'Do you want to update to the new version?',type:'warning',showCancelButton:true},function(){
+    openBox('/plugins/dynamix.plugin.manager/scripts/plugin&arg1=update&arg2=unRAIDServer.plg','Update Unraid OS',600,900,true);
+  });
+}
+function notifier() {
+  var tub1 = 0, tub2 = 0, tub3 = 0;
+  $.post('/webGui/include/Notify.php',{cmd:'get'},function(json) {
+    var data = $.parseJSON(json);
+    $.each(data, function(i, object) {
+      var notify = $.parseJSON(object);
+      $.jGrowl(notify.subject+'<br>'+notify.description, {
+        group: notify.importance,
+        header: notify.event+': '+notify.timestamp,
+        theme: notify.file,
+        beforeOpen: function(e,m,o){if ($('div.jGrowl-notify').hasClass(notify.file)) return(false);},
+        beforeClose: function(e,m,o){$.post('/webGui/include/Notify.php',{cmd:'archive',file:notify.file});}
+      });
+    });
+    timers.notifier = setTimeout(notifier,5000);
+  });
+}
+function digits(number) {
+  if (number < 10) return 'one';
+  if (number < 100) return 'two';
+  return 'three';
+}
+function openNotifier(filter) {
+  $.post('/webGui/include/Notify.php',{cmd:'get'},function(json) {
+    var data = $.parseJSON(json);
+    $.each(data, function(i, object) {
+      var notify = $.parseJSON(object);
+      if (notify.importance == filter) {
+        $.jGrowl(notify.subject+'<br>'+notify.description, {
+          group: notify.importance,
+          header: notify.event+': '+notify.timestamp,
+          theme: notify.file,
+          beforeOpen: function(e,m,o){if ($('div.jGrowl-notify').hasClass(notify.file)) return(false);},
+          beforeClose: function(e,m,o){$.post('/webGui/include/Notify.php',{cmd:'archive',file:notify.file});}
+        });
+      }
+    });
+  });
+}
+function closeNotifier(filter) {
+  clearTimeout(timers.notifier);
+  $.post('/webGui/include/Notify.php',{cmd:'get'},function(json) {
+    var data = $.parseJSON(json);
+    $.each(data, function(i, object) {
+      var notify = $.parseJSON(object);
+      if (notify.importance == filter) $.post('/webGui/include/Notify.php',{cmd:'archive',file:notify.file});
+    });
+    $('div.jGrowl').find('.'+filter).find('div.jGrowl-close').trigger('click');
+    setTimeout(notifier,100);
+  });
+}
+function viewHistory(filter) {
+  location.replace('/Tools/NotificationsArchive?filter='+filter);
+}
+$(function() {
+  var tab = $.cookie('one')||$.cookie('tab')||'tab1';
+  if (tab=='tab0') tab = 'tab'+$('input[name$="tabs"]').length; else if ($('#'+tab).length==0) {initab(); tab = 'tab1';}
+  if ($.cookie('help')=='help') {$('.inline_help').show(); $('#nav-item.HelpButton').addClass('active');}
+  $('#'+tab).attr('checked', true);
+  updateTime();
+  $.jGrowl.defaults.closeTemplate = '<i class="fa fa-close"></i>';
+  $.jGrowl.defaults.closerTemplate = '<div class="top">[ close all notifications ]</div>';
+  $.jGrowl.defaults.sticky = true;
+  $.jGrowl.defaults.check = 100;
+  $.jGrowl.defaults.position = 'top-right';
+  $.jGrowl.defaults.themeState = '';
+  Shadowbox.setup('a.sb-enable', {modal:true});
+});
+var mobiles=['ipad','iphone','ipod','android'];
+var device=navigator.platform.toLowerCase();
+for (var i=0,mobile; mobile=mobiles[i]; i++) {
+  if (device.indexOf(mobile)>=0) {$('#footer').css('position','static'); break;}
+}
+$.ajaxPrefilter(function(s, orig, xhr){
+  if (s.type.toLowerCase() == "post" && !s.crossDomain) {
+    s.data = s.data || "";
+    s.data += s.data?"&":"";
+    s.data += "csrf_token=1D84AB24441EAF74";
+  }
+});
+</script>
+</head>
+<body>
+ <div id="template">
+  <div class="upgrade_notice" style="display:none"></div><div class="ca_plugin_notice ca_element_notice"></div>
+  <div id="header" class="">
+   <div class="logo">
+   <a href="https://unraid.net" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 222.36 39.04"><defs><linearGradient id="header-logo" x1="47.53" y1="79.1" x2="170.71" y2="-44.08" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e32929"></stop><stop offset="1" stop-color="#ff8d30"></stop></linearGradient></defs><title>unraid.net</title><path d="M146.7,29.47H135l-3,9h-6.49L138.93,0h8l13.41,38.49h-7.09L142.62,6.93l-5.83,16.88h8ZM29.69,0V25.4c0,8.91-5.77,13.64-14.9,13.64S0,34.31,0,25.4V0H6.54V25.4c0,5.17,3.19,7.92,8.25,7.92s8.36-2.75,8.36-7.92V0ZM50.86,12v26.5H44.31V0h6.11l17,26.5V0H74V38.49H67.9ZM171.29,0h6.54V38.49h-6.54Zm51.07,24.69c0,9-5.88,13.8-15.17,13.8H192.67V0H207.3c9.18,0,15.06,4.78,15.06,13.8ZM215.82,13.8c0-5.28-3.3-8.14-8.52-8.14h-8.08V32.77h8c5.33,0,8.63-2.8,8.63-8.08ZM108.31,23.92c4.34-1.6,6.93-5.28,6.93-11.55C115.24,3.68,110.18,0,102.48,0H88.84V38.49h6.55V5.66h6.87c3.8,0,6.21,1.82,6.21,6.71s-2.41,6.76-6.21,6.76H98.88l9.21,19.36h7.53Z" fill="url(#header-logo)"></path></svg>
+</a>
+   Version: 6.7.2&nbsp;<a href="#" title="View Release Notes" onclick="openBox('/plugins/dynamix.plugin.manager/include/ShowChanges.php?tmp=1&amp;file=/var/tmp/unRAIDServer.txt','Release Notes',600,900);return false"><span class="fa fa-info-circle fa-fw"></span></a>   </div>
+   <div class="block">
+    <span class="text-left">Server<br>Description<br>Registration<br>Uptime</span>
+    <span class="text-right">Proton • 192.168.0.4<br>Simse's server<br>
+    <a href="/Tools/Registration" title="Go to Registration page">Unraid OS <span id="licensetype">Plus</span><span id="licenseexpire"></span></a><br>
+    <span class="uptime">10 days, 4 hours, 15 minutes</span></span>
+   </div>
+  </div>
+  <a href="#" class="back_to_top" title="Back To Top"><i class="fa fa-arrow-circle-up"></i></a>
+<div id="menu"><div id="nav-block"><div id="nav-left"><div id="nav-item"><a href="/Dashboard" onclick="initab()">Dashboard</a></div><div id="nav-item" class="active"><a href="/Main" onclick="initab()">Main</a></div><div id="nav-item"><a href="/Shares" onclick="initab()">Shares</a></div><div id="nav-item"><a href="/Users" onclick="initab()">Users</a></div><div id="nav-item"><a href="/Settings" onclick="initab()">Settings</a></div><div id="nav-item"><a href="/Plugins" onclick="initab()">Plugins</a></div><div id="nav-item"><a href="/Docker" onclick="initab()">Docker</a></div><div id="nav-item"><a href="/VMs" onclick="initab()">VMs</a></div><div id="nav-item"><a href="/Apps" onclick="initab()">Apps</a></div><div id="nav-item"><a href="/Tools" onclick="initab()">Tools</a></div><div class="usage-bar"><span style="width:90%" class="redbar">90%</span></div></div><div id="nav-right"><script>
+function LogoutButton() {
+  var id = window.setTimeout(null,0);
+  while (id--) window.clearTimeout(id);
+  $.ajax({
+    type: "GET",
+    url: "/logout.htm",
+    username: "logout",
+    password: "",
+    success: function (data){
+      $('body').html(data);
+    }
+  });
+}
+</script>
+<div id="nav-item" class="LogoutButton util"><a href="#" onclick="LogoutButton();return false;" title="Logout"><i class="icon-u-logout system"></i><span>Logout</span></a></div><script>
+function TerminalButton() {
+  var d = new Date();
+  var height = 600;
+  var width = 900;
+  var top = (screen.height-height)/2;
+  var left = (screen.width-width)/2;
+  window.open('/webterminal/', 'Web Terminal '+d.getTime(), 'resizeable=yes,scrollbars=yes,height='+height+',width='+width+',top='+top+',left='+left).focus();
+}
+</script>
+<div id="nav-item" class="TerminalButton util"><a href="/webterminal/" onclick="TerminalButton();return false;" title="Terminal"><i class="icon-u-terminal system"></i><span>Terminal</span></a></div><script>
+function FeedbackButton() {
+	openBox('/webGui/include/Feedback.php','Feedback',600,600,false);
+}
+</script><div id="nav-item" class="FeedbackButton util"><a href="#" onclick="FeedbackButton();return false;" title="Feedback"><i class="icon-u-chat system"></i><span>Feedback</span></a></div><script>
+function HelpButton() {
+  if ($('#nav-item.HelpButton').toggleClass('active').hasClass('active')) {
+    $('.inline_help').show('slow');
+    $.cookie('help','help',{path:'/'});
+  } else {
+    $('.inline_help').hide('slow');
+    $.removeCookie('help',{path:'/'});
+  }
+}
+</script><div id="nav-item" class="HelpButton util"><a href="#" onclick="HelpButton();return false;" title="Help"><i class="icon-u-help system"></i><span>Help</span></a></div><script>
+function InfoButton() {
+  openBox('/webGui/include/SystemInformation.php?more=','System Information',600,600);
+}
+</script><div id="nav-item" class="InfoButton util"><a href="#" onclick="InfoButton();return false;" title="Info"><i class="icon-u-display system"></i><span>Info</span></a></div><script>
+function LogButton() {
+  openWindow('/webGui/scripts/tail_log&arg1=syslog','System Log',600,900);
+}
+</script>
+<div id="nav-item" class="LogButton util"><a href="#" onclick="LogButton();return false;" title="Log"><i class="icon-u-log system"></i><span>Log</span></a></div><style>
+.ca_plugin_notice{position:fixed;top:1px;left:0;}
+.ca_element_notice{padding-right:20px;width:100%;height:40px;line-height:40px;color:#e68a00;background:#feefb3;border-bottom:#e68a00 1px solid;text-align:center;font-size:1.4rem;z-index:900;display:none;}
+.ca_PluginUpdateDismiss{float:right;margin-right:20px;cursor:pointer;}
+.ca_pluginUpdateInfo{cursor:pointer;}
+.ca_PluginUpdateInstall{cursor:pointer;}
+a.bannerInfo {cursor:pointer;text-decoration:none;}
+.bannerInfo::before {content:"\f05a";font-family:fontAwesome;color:#e68a00;}
+</style>
+<script>
+var ca_PluginUpdatePLG;
+var ca_PluginUpdateElement;
+var ca_WarningItems = [];
+var currentWarning = 0;
+warningInterval = false;
+
+$(function() {
+	$(".upgrade_notice").after("<div class='ca_plugin_notice ca_element_notice'></div>");
+});
+
+if ( typeof caPluginUpdateCheck !== "function" ) {
+	function ca_PluginUpdate_openBox(cmd,title,height,width,load,func) {
+		// open shadowbox window (run in foreground)
+		var run = cmd.split('?')[0].substr(-4)=='.php' ? cmd : '/logging.htm?cmd='+cmd+'&csrf_token=1D84AB24441EAF74';
+		var options = load ? {modal:true,onClose:function(){ eval(func); }} : {modal:true};
+		Shadowbox.open({content:run, player:'iframe', title:title, height:height, width:width, options:options});
+	}
+
+	function ca_hidePluginUpdate(version) {
+		$.cookie(ca_PluginUpdatePLG,version);
+		$(ca_PluginUpdateElement).hide();
+	}
+
+	function ca_pluginUpdateInstall(plugin) {
+		ca_PluginUpdate_openBox("/plugins/community.applications/scripts/installPluginUpdate.sh&arg1="+plugin,"Installing Update",600,900,true,"window.location.reload()");
+	}
+
+	function ca_pluginUpdateShowInfo(cmd,title,height,width,load,func,id) {
+		// open shadowbox window (run in foreground)
+		var run = cmd.split('?')[0].substr(-4)=='.php' ? cmd : '/logging.htm?cmd='+cmd+'&csrf_token=1D84AB24441EAF74';
+		var options = load ? (func ? {modal:true,onClose:function(){setTimeout(func+'('+'"'+(id||'')+'")',0);}} : {modal:false,onClose:function(){location=location;}}) : {modal:false};
+		Shadowbox.open({content:run, player:'iframe', title:title, height:Math.min(height,screen.availHeight), width:Math.min(width,screen.availWidth), options:options});
+	}
+
+	function ca_pluginUpdate_evaluateBoolean(str) {
+		regex=/^\s*(true|1|on)\s*$/i
+		return regex.test(str);
+	}
+
+	function caPluginUpdateCheck(plugin,options=[],callback) {
+		ca_PluginUpdatePLG = plugin;
+		pluginFilename = plugin.substr(0, plugin.lastIndexOf("."));
+		console.time("checkPlugin "+plugin);
+		console.log("checkPlugin  "+plugin);
+		$.post("/plugins/community.applications/scripts/PluginAPI.php",{action:'checkPlugin',options:{plugin:plugin}},function(caAPIresult) {
+			console.groupCollapsed("Result checkPlugin "+plugin);
+			console.log(caAPIresult);
+			console.timeEnd("checkPlugin "+plugin);
+			console.groupEnd();
+			var result = JSON.parse(caAPIresult);
+
+			if ( options.debug == true ) result.updateAvailable = true;
+			var name = options.name ? options.name : "this plugin ("+plugin+")";
+			if ( ! options.element ) {
+				if ( result.updateAvailable ) {
+					var HTML = "An upgrade to "+name+" is available.  Click <a class='ca_PluginUpdateInstall' onclick='ca_pluginUpdateInstall(&quot;"+plugin+"&quot;);'>here</a> to install version "+result.version+" <a class='bannerInfo fa fa-info-circle' onclick=ca_pluginUpdateShowInfo('/plugins/dynamix.plugin.manager/include/ShowChanges.php?file=%2Ftmp%2Fplugins%2F"+pluginFilename+".txt','Release&nbsp;Notes',600,900); return false;'></a>";
+					addBannerWarning(HTML,false,ca_pluginUpdate_evaluateBoolean(options.noDismiss));
+				}
+			} else {
+				if ( $.cookie(plugin) != result.version ) {
+					if ( result.updateAvailable ) {
+						var HTML = "An upgrade to "+name+" is available.  Click <a class='ca_PluginUpdateInstall' onclick='ca_pluginUpdateInstall(&quot;"+plugin+"&quot;);'>here</a> to install version "+result.version+" <i class='ca_pluginUpdateInfo fa fa-info-circle' onclick=ca_pluginUpdateShowInfo('/plugins/dynamix.plugin.manager/include/ShowChanges.php?file=%2Ftmp%2Fplugins%2F"+pluginFilename+".txt','Release&nbsp;Notes',600,900); return false;'></i>";
+						if ( ! ca_pluginUpdate_evaluateBoolean(options.noDismiss) ) {
+							HTML = HTML.concat("<span class='ca_PluginUpdateDismiss'><i class='fa fa-close' onclick='ca_hidePluginUpdate(&quot;"+result.version+"&quot;);'></i>");
+						}
+						result.HTML = HTML;
+						ca_PluginUpdateElement = options.element ? options.element : ".ca_plugin_notice";
+
+						if ( ! ca_pluginUpdate_evaluateBoolean(options.dontShow) ) {
+							if ( ! options.element ) {
+								$(".ca_element_notice").html(HTML);
+								if (options.priority) {
+									var z_index = $(".upgrade_notice").css("z-index");
+									$(".ca_element_notice").css("z-index",z_index+1);
+								}
+							} else {
+								$(ca_PluginUpdateElement).html(HTML);
+							}
+							$(ca_PluginUpdateElement).addClass("ca_element_notice").show();
+						}
+					}
+				}
+			}
+			if ( typeof options === "function" ) {
+				callback = options;
+			}
+			if ( typeof callback === "function" ) {
+				callback(JSON.stringify(result));
+			}
+		});
+	}
+}
+
+if ( typeof addBannerWarning !== "function" ) {
+	function addBannerWarning(text,warning=true,noDismiss=false) {
+		var cookieText = text.replace(/[^a-z0-9]/gi,'');
+		if ( $.cookie(cookieText) == "true" ) { return false; }
+
+		var z_index = $(".upgrade_notice").css("z-index");
+		$(".ca_element_notice").css("z-index",z_index+1); // Warnings take precendence over unRaid's OS warnings
+		if ( warning ) {
+			text = "<i class='fa fa-warning'></i> "+text;
+		}
+		var arrayEntry = ca_WarningItems.push("placeholder") - 1;
+		if ( ! noDismiss ) {
+			text = text + "<span class='ca_PluginUpdateDismiss'><i class='fa fa-close' onclick='dismissBannerWarning("+arrayEntry+",&quot;"+cookieText+"&quot;)'></i>";
+		}
+		ca_WarningItems[arrayEntry] = text;
+		if ( ! warningInterval ) {
+			showWarnings();
+			warningInterval = setInterval(function() {
+				showWarnings()
+			},10000);
+		}
+		return arrayEntry;
+	}
+
+	function dismissBannerWarning(entry,cookieText) {
+		$.cookie(cookieText,"true");
+		removeBannerWarning(entry);
+	}
+
+	function removeBannerWarning(entry) {
+		ca_WarningItems[entry] = false;
+		showWarnings();
+	}
+
+	function filterArray(array) {
+		var newArray = [];
+		array.filter(function(value,index,arr) {
+			if ( value ) {
+				newArray.push(value);
+			}
+		});
+		return newArray;
+	}
+
+	function showWarnings() {
+		var allWarnings = filterArray(Object.values(ca_WarningItems));
+		if ( allWarnings.length == 0 ) {
+			$(".ca_plugin_notice,.ca_element_notice").hide();
+			clearInterval(warningInterval);
+			warningInterval = false;
+			return;
+		}
+		if ( currentWarning >= allWarnings.length ) {
+			currentWarning = 0;
+		}
+		$(".upgrade_notice").hide();
+		$(".ca_plugin_notice,.ca_element_notice").show();
+		$(".ca_plugin_notice").html(allWarnings[currentWarning]);
+		currentWarning++;
+	}
+}
+</script>
+<div id="nav-user"></div></div></div></div><div class="tabs"><div class="tab"><input type="radio" id="tab1" name="tabs" checked="checked"><div class="content shift"><div id="title"><span class="left"><i class="fa fa-database title"></i>Array Devices</span><span class="status vhshift"><a style="cursor:pointer" class="tooltip_diskio tooltipstered" onclick="toggle_diskio();return false"><i class="toggle fa fa-tachometer"></i></a></span></div>
+<script>
+function toggle_state(device,name,action) {
+  var event = null;
+  var button = null;
+  if (name) {
+    if (name.match(/^(parity|disk)/)!==null) event = 'array_status';
+    else if (name.match(/^cache/)!==null) event = 'cache_status';
+    else if (name.match(/^flash/)!==null) event = 'boot_status';
+    else event = 'open_status';
+    $('#dev-'+name).removeClass('fa-sort-up fa-sort-down').addClass('fa-refresh fa-spin');
+  } else if (device!='Clear') {
+    $('[id^="dev-"]').removeClass('fa-sort-up fa-sort-down').addClass('fa-refresh fa-spin');
+    button = '[id^=button-]';
+  }
+  pauseEvents(event);
+  $.post('/webGui/include/ToggleState.php',{device:device,name:name,action:action,state:'STARTED',csrf:'1D84AB24441EAF74'},function(){resumeEvents(event,500);if (button) $(button).prop('disabled',false);});
+}
+function display_diskio() {
+  if ($.cookie('diskio')===undefined) {
+    $('span.number').show(); $('span.diskio').hide();
+  } else {
+    $('span.diskio').show(); $('span.number').hide();
+  }
+}
+function toggle_diskio(init) {
+  if (!init) {
+    if ($.cookie('diskio')===undefined) $.cookie('diskio','diskio',{path:'/',expires:3650}); else $.removeCookie('diskio',{path:'/'});
+  }
+  if ($.cookie('diskio')===undefined) {
+    $('i.toggle').removeClass('fa-tachometer').addClass('fa-list');
+  } else {
+    $('i.toggle').removeClass('fa-list').addClass('fa-tachometer');
+  }
+  display_diskio();
+}
+function array_status() {
+  var diskio = $.cookie('diskio')===undefined ? 0 : 1;
+  $.post('/webGui/include/DeviceList.php',{path:'Main',device:'array'},function(data) {
+    if (data) {$('#array_devices').html(data); display_diskio();}
+    timers.array_status = setTimeout(array_status,3000);
+  });
+}
+$('#tab1').bind({click:function() {$('i.toggle').show('slow');}});
+
+array_status();
+</script>
+
+<table class="disk_status wide">
+<thead><tr style="cursor: help;"><td>Device</td><td>Identification</td><td>Temp.</td><td>Reads</td><td>Writes</td><td>Errors</td><td>FS</td><td>Size</td><td>Used</td><td>Free</td><td>View</td></tr></thead>
+<tbody id="array_devices"><tr><td><i id="dev-disk1" class="fa fa-sort-down fa-fw" style="cursor:pointer" title="Click to spin down device" onclick="toggle_state('Device','disk1','down')"></i><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Device?name=disk1">Disk 1</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sdc','Disk Log Information',600,900,false);return false"><i class="icon-disk icon"></i></a><span style="font-family:bitstream">WDC_WD80EMAZ-00WJTA0_7HKRY8MJ</span> - 8 TB (sdc)</td><td>29 C</td><td><span class="diskio">680.6 KB/s</span><span class="number" style="display: none;">1,017,699</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">2853</span></td><td>0</td><td>xfs</td><td>8 TB</td><td>7.37 TB</td><td><div class="usage-disk"><span style="width:8%" class="redbar"></span><span>625 GB</span></div></td><td><a href="Main/Browse?dir=/mnt/disk1"><img src="/webGui/images/explore.png" title="Browse /mnt/disk1"></a></td></tr><tr><td><i id="dev-disk2" class="fa fa-sort-down fa-fw" style="cursor:pointer" title="Click to spin down device" onclick="toggle_state('Device','disk2','down')"></i><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Device?name=disk2">Disk 2</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sdg','Disk Log Information',600,900,false);return false"><i class="icon-disk icon"></i></a><span style="font-family:bitstream">ST6000VN0033-2EE110_ZAD8BT5X</span> - 6 TB (sdg)</td><td>28 C</td><td><span class="diskio">240.3 KB/s</span><span class="number" style="display: none;">225,664</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">47</span></td><td>0</td><td>xfs</td><td>6 TB</td><td>5.40 TB</td><td><div class="usage-disk"><span style="width:10%" class="redbar"></span><span>602 GB</span></div></td><td><a href="Main/Browse?dir=/mnt/disk2"><img src="/webGui/images/explore.png" title="Browse /mnt/disk2"></a></td></tr><tr><td><i id="dev-disk3" class="fa fa-sort-down fa-fw" style="cursor:pointer" title="Click to spin down device" onclick="toggle_state('Device','disk3','down')"></i><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Device?name=disk3">Disk 3</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sde','Disk Log Information',600,900,false);return false"><i class="icon-disk icon"></i></a><span style="font-family:bitstream">WDC_WD100EZAZ-11TDBA0_JEK6BK6N</span> - 10 TB (sde)</td><td>27 C</td><td><span class="diskio">7.8 MB/s</span><span class="number" style="display: none;">6,688,297</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">206</span></td><td>0</td><td>xfs</td><td>10 TB</td><td>9.41 TB</td><td><div class="usage-disk"><span style="width:6%" class="redbar"></span><span>586 GB</span></div></td><td><a href="Main/Browse?dir=/mnt/disk3"><img src="/webGui/images/explore.png" title="Browse /mnt/disk3"></a></td></tr><tr><td><i id="dev-disk4" class="fa fa-sort-down fa-fw" style="cursor:pointer" title="Click to spin down device" onclick="toggle_state('Device','disk4','down')"></i><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Device?name=disk4">Disk 4</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sdd','Disk Log Information',600,900,false);return false"><i class="icon-disk icon"></i></a><span style="font-family:bitstream">WDC_WD100EMAZ-00WJTA0_JEHR4J0Z</span> - 10 TB (sdd)</td><td>27 C</td><td><span class="diskio">2.5 MB/s</span><span class="number" style="display: none;">3,441,777</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">13,801</span></td><td>0</td><td>xfs</td><td>10 TB</td><td>9.02 TB</td><td><div class="usage-disk"><span style="width:10%" class="redbar"></span><span>977 GB</span></div></td><td><a href="Main/Browse?dir=/mnt/disk4"><img src="/webGui/images/explore.png" title="Browse /mnt/disk4"></a></td></tr><tr><td><i id="dev-disk5" class="fa fa-sort-down fa-fw" style="cursor:pointer" title="Click to spin down device" onclick="toggle_state('Device','disk5','down')"></i><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Device?name=disk5">Disk 5</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sdf','Disk Log Information',600,900,false);return false"><i class="icon-disk icon"></i></a><span style="font-family:bitstream">WDC_WD6003FFBX-68MU3N0_V8H5P43R</span> - 6 TB (sdf)</td><td>27 C</td><td><span class="diskio">917.5 KB/s</span><span class="number" style="display: none;">1,755,641</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">73</span></td><td>0</td><td>xfs</td><td>6 TB</td><td>4.84 TB</td><td><div class="usage-disk"><span style="width:19%" class="orangebar"></span><span>1.16 TB</span></div></td><td><a href="Main/Browse?dir=/mnt/disk5"><img src="/webGui/images/explore.png" title="Browse /mnt/disk5"></a></td></tr><tr></tr><tr></tr><tr></tr><tr></tr><tr></tr><tr class="tr_last"><td></td><td>Array of five devices</td><td>27.6 C</td><td><span class="diskio">12.2 MB/s</span><span class="number" style="display: none;">13,129,078</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">16,980</span></td><td>0</td><td></td><td>40 TB</td><td>36.0 TB</td><td><div class="usage-disk"><span style="width:10%" class="redbar"></span><span>3.94 TB</span></div></td><td></td></tr></tbody>
+</table>
+
+<blockquote class="inline_help" id="helpinfo0">
+  <p><strong>Colored Status Indicator</strong> the significance of the color indicator at the beginning of each line in <em>Array Devices</em> is as follows:</p>
+
+  <p><i class="fa fa-circle orb green-orb"></i>Normal operation, device is active.</p>
+
+  <p><i class="fa fa-circle orb grey-orb"></i>Device is in standby mode (spun-down).</p>
+
+  <p><i class="fa fa-warning orb yellow-orb"></i>Device contents emulated.</p>
+
+  <p><i class="fa fa-times orb red-orb"></i>Device is disabled, contents emulated.</p>
+
+  <p><i class="fa fa-square orb blue-orb"></i>New device.</p>
+
+  <p><i class="fa fa-square orb grey-orb"></i>No device present, position is empty.</p>
+
+  <p><strong>Identification</strong> is the <em>signature</em> that uniquely identifies a storage device. The signature
+  includes the device model number, serial number, linux device id, and the device size.</p>
+
+  <p><strong>Temp.</strong> (temperature) is read directly from the device. You configure which units to use on
+  the <a href="Settings/DisplaySettings">Display Preferences</a> page.  We do not read the temperature of spun-down hard
+  drives since this typically causes them to spin up; instead we display the <code>*</code> symbol.  We also
+  display the <code>*</code> symbol for SSD and Flash devices, though sometimes these devices do report a valid
+  temperature, and sometimes they return the value <code>0</code>.</p>
+
+  <p><strong>Size, Used, Free</strong> reports the total device size, used space, and remaining space for files.  These
+  units are also configured on the <a href="Settings/DisplaySettings">Display Preferences</a> page.  The
+  amount of space used will be non-zero even for an empty disk due to file system overhead.</p>
+
+  <p><em>Note: for a multi-device cache pool, this data is for the entire pool as returned by btrfs.</em></p>
+
+  <p><strong>Reads, Writes</strong> are a count of I/O requests sent to the device I/O drivers.  These statistics may
+  be cleared at any time, refer to the Array Status section below.</p>
+
+  <p><strong>Errors</strong> counts the number of <em>unrecoverable</em> errors reported by the device
+  I/O drivers. Missing data due to unrecoverable array read errors is filled in on-the-fly using parity
+  reconstruct (and we attempt to write this data back to the sector(s) which failed). Any unrecoverable
+  write error results in <em>disabling</em> the disk.</p>
+
+  <p><strong>FS</strong> indicates the file system detected in partition 1 of the device.</p>
+
+  <p><strong>View</strong> column contains a folder icon indicating the device is <em>mounted</em>. Click the icon to
+  browse the file system.</p>
+
+  <p>If "Display array totals" is enable on the <a href="Settings/DisplaySettings">Display Preferences</a> page, a
+  <strong>Total</strong> line is included which provides a tally of the device statistics, including the average temperature
+  of your devices.</p>
+
+  <p>The Array must be Stopped in order to change Array device assignments.</p>
+
+  <p>An Unraid array consists of a single Parity disk and a number of Data disks. The Data
+  disks are exclusively used to store user data, and the Parity disk provides the redundancy necessary
+  to recover from any singe disk failure.</p>
+
+  <p>Since data is not striped across the array, the Parity disk must be as large, or larger than the largest Data
+  disk.  Parity should also be your highest performance drive.</p>
+
+  <p>Each Data disk has its own file system and can be exported as a
+  separate share.</p>
+
+  <p>Click on the Device name to configure individual device settings and launch certain utilities.</p>
+</blockquote>
+
+<p></p>
+
+<div id="title"><span class="left"><i class="fa fa-bullseye title"></i>Cache Devices</span><span class="status vhshift"><a style="cursor:pointer" class="tooltip_diskio tooltipstered" onclick="toggle_diskio();return false"><i class="toggle fa fa-tachometer"></i></a></span></div>
+<script>
+function cache_status() {
+  $.post('/webGui/include/DeviceList.php',{path:'Main',device:'cache'},function(data) {
+    if (data) {$('#cache_device').html(data); display_diskio();}
+    timers.cache_status = setTimeout(cache_status,3000);
+  });
+}
+$('#tab2').bind({click:function() {$('i.toggle').show('slow');}});
+
+cache_status();
+</script>
+
+<table class="disk_status wide">
+<thead><tr style="cursor: help;"><td>Device</td><td>Identification</td><td>Temp.</td><td>Reads</td><td>Writes</td><td>Errors</td><td>FS</td><td>Size</td><td>Used</td><td>Free</td><td>View</td></tr></thead>
+<tbody id="cache_device"><tr><td><i id="dev-cache" class="fa fa-sort-down fa-fw" style="cursor:pointer" title="Click to spin down device" onclick="toggle_state('Device','cache','down')"></i><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Device?name=cache">Cache</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sdb','Disk Log Information',600,900,false);return false"><i class="icon-nvme icon"></i></a><span style="font-family:bitstream">Samsung_SSD_850_EVO_500GB_S21JNXAG410670R</span> - 500 GB (sdb)</td><td>35 C</td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">1,783,507</span></td><td><span class="diskio">45.1 KB/s</span><span class="number" style="display: none;">2,088,720</span></td><td>0</td><td>btrfs</td><td>500 GB</td><td>70.7 GB</td><td><div class="usage-disk"><span style="width:86%" class="greenbar"></span><span>429 GB</span></div></td><td><a href="Main/Browse?dir=/mnt/cache"><img src="/webGui/images/explore.png" title="Browse /mnt/cache"></a></td></tr></tbody>
+</table>
+
+<blockquote class="inline_help" id="helpinfo1">
+  <p><strong>Colored Status Indicator</strong> the significance of the color indicator at the beginning of each line in <em>Cache Devices</em> is as follows:</p>
+
+  <p><i class="fa fa-circle orb green-orb"></i>Normal operation, device is active.</p>
+
+  <p><i class="fa fa-circle orb grey-orb"></i>Device is in standby mode (spun-down).</p>
+
+  <p><i class="fa fa-square orb blue-orb"></i>New device.</p>
+
+  <p><i class="fa fa-square orb grey-orb"></i>No device present, position is empty.</p>
+
+  <p><strong>Cache</strong> is a device, or device pool, <em>outside</em> the Unraid array.  It may be exported for network access just
+  like an Array device.  Being outside the Unraid array results in significantly faster write access.</p>
+
+  <p>There are two ways to configure the Cache:</p>
+
+  <ol>
+  <li>As a single device, or</li>
+  <li>As a multi-device pool.</li>
+  </ol>
+
+  <p>When configured as a single device you may format the device using any supported file system (btrfs, reiserfs,
+  or xfs).  This configuration offers the highest performance, but at the cost of no data protection - if the
+  single Cache device fails all data contained on it may be lost.</p>
+
+  <p>When configured as a multi-device pool, Unraid OS will automatically select <em>btrfs-raid1</em> format (for both data
+  and meta-data).  btrfs permits any number of devices to be added to the pool and each copy of data is guaranteed
+  to be written to two different devices.  Hence the pool can withstand a single-disk failure without losing data.</p>
+
+  <p>When <a href="/Settings/ShareSettings">User Shares</a> are enabled, user shares may be configured to
+  automatically make use of the Cache in order to
+  speed up writes.  A special background process called the <em>mover</em> can be scheduled to run
+  periodically to move user share files off the Cache and onto the Array.</p>
+</blockquote>
+
+<p></p>
+
+<div id="title"><span class="left"><i class="fa fa-paw title"></i>Boot Device</span><span class="status vhshift"><a style="cursor:pointer" class="tooltip_diskio tooltipstered" onclick="toggle_diskio();return false"><i class="toggle fa fa-tachometer"></i></a></span></div>
+<script>
+function boot_status() {
+  $.post('/webGui/include/DeviceList.php',{path:'Main',device:'flash'},function(data) {
+    if (data) {$('#boot_device').html(data); display_diskio();}
+    timers.boot_status = setTimeout(boot_status,3000);
+  });
+}
+$('#tab3').bind({click:function() {$('i.toggle').show('slow');}});
+
+boot_status();
+</script>
+
+<table class="disk_status wide">
+<thead><tr style="cursor: help;"><td>Device</td><td>Identification</td><td>Temp.</td><td>Reads</td><td>Writes</td><td>Errors</td><td>FS</td><td>Size</td><td>Used</td><td>Free</td><td>View</td></tr></thead>
+<tbody id="boot_device"><tr><td><a class="info nohand" onclick="return false"><i class="fa fa-circle orb green-orb"></i><span>Normal operation, device is active</span></a><a href="Main/Flash?name=flash">Flash</a></td><td><a href="#" title="Disk Log Information" style="text-decoration:none" onclick="openBox('/webGui/scripts/disk_log&amp;arg1=sda','Disk Log Information',600,900,false);return false"><i class="icon-usb icon"></i></a><span style="font-family:bitstream">Cruzer_Blade</span> - 16 GB (sda)</td><td>*</td><td><span class="diskio">938.0 B/s</span><span class="number" style="display: none;">2683</span></td><td><span class="diskio">0.0 B/s</span><span class="number" style="display: none;">477</span></td><td>0</td><td>vfat</td><td>16 GB</td><td>613 MB</td><td><div class="usage-disk"><span style="width:96%" class="greenbar"></span><span>15.4 GB</span></div></td><td><a href="Main/Browse?dir=/boot"><img src="/webGui/images/explore.png" title="Browse /boot"></a></td></tr></tbody>
+</table>
+
+<blockquote class="inline_help" id="helpinfo2">
+  <p>Vital array configuration is maintained on the USB Flash device; for this reason, it must remain
+  plugged in to your server.  Click on <a href="/Main/Flash?name=flash">Flash</a> to see the GUID and registration
+  information, and to configure export settings.  Since the USB Flash device is formatted using FAT file system,
+  it may only be exported using SMB protocol.</p>
+</blockquote>
+<div id="title"><span class="left"><i class="fa fa-snowflake-o title"></i>Array Operation</span></div><p></p>
+
+<style>
+tr#copy,tr#file{display:none}
+td.gap{padding-left:26px!important}
+span#pass{display:none;margin-left:20px}
+</style>
+
+<script>
+var ctrl = "<span class='status vhshift'><a style='cursor:pointer' class='tooltip_diskio' title='Toggle reads/writes display' onclick='toggle_diskio();return false'><i class='toggle fa'></i></a></span>";
+
+function selectInput(form) {
+  if (form.input.value == 'text') {
+    form.file.value = '';
+    form.local.value = '';
+    $('#file').hide();
+    $('input[name="text"],input[name="copy"]').attr('type',$('input[name="showPass"]').prop('checked')?'text':'password');
+    $('#cmdStart').prop('disabled',$('#copy').is(':visible') ? (form.text.value!=form.copy.value || form.text.value=='') : form.text.value=='');
+  } else {
+    form.text.value = '';
+    form.copy.value = '';
+    $('#text').hide();
+    $('#copy').hide();
+    $('#file').show();
+    $('#pass').hide();
+    $('#cmdStart').prop('disabled',!form.file.value);
+  }
+}
+function getFileContent(event,form) {
+  var input = event.target;
+  var reader = new FileReader();
+  reader.onload = function(){form.file.value=reader.result;selectInput(form);};
+  reader.readAsDataURL(input.files[0]);
+}
+function prepareInput(form) {
+  $(form).append('<input type="hidden" name="cmdStart" value="Start">');
+  if (form.input === undefined) {
+    form.submit();
+  } else {
+    var data = {};
+    data['#file'] = 'unused';
+    data['#include'] = 'webGui/include/KeyUpload.php';
+    data['text'] = form.text.value;
+    data['file'] = form.file.value;
+    form.input.disabled = true;
+    form.local.disabled = true;
+    form.file.disabled = true;
+    form.text.disabled = true;
+    form.copy.disabled = true;
+    $.post('/update.php',data,function(){form.submit();});
+  }
+}
+function parityWarning(form) {
+  if (form.md_invalidslot.checked) {
+    var text = '<i>Parity valid</i> requires <b>ALL</b> disks to have their original content';
+  } else {
+    var text = '<i>Parity</i> disk(s) content will be overwritten';
+  }
+  swal({title:'Proceed to start',text:text,html:true,type:'warning',confirmButtonText:'Proceed',showCancelButton:true},function(){prepareInput(form);});
+}
+function tab0() {
+  $.removeCookie('one',{path:'/'});
+  $.cookie('tab','tab0',{path:'/'});
+}
+function parityStatus() {
+  $.post('/webGui/include/DeviceList.php',{path:'Main',device:'parity'},function(data) {
+    if (data) {$.each(data.split(';'),function(k,v) {if ($('#line'+k).length>0) $('#line'+k).html(v);});}
+    timers.parityStatus = setTimeout(parityStatus,3000);
+    if (!data && $('#cancelButton').length>0 && $('#cancelButton').val()=='Cancel') {
+      $('#cancelButton').val('Done').prop('onclick',null).off('click').click(function(){refresh();});
+      $('#cancelText').html('');
+      $('#line4').html('completed');
+    }
+  });
+}
+function stopArray(form) {
+  $(form).append('<input type="hidden" name="cmdStop" value="Stop">');
+  swal({title:'Proceed?',text:'This will stop the array',type:'warning',showCancelButton:true},function(p){if (p) form.submit(); else $('input[name="cmdStop"]').remove();});
+}
+function stopParity(form,text) {
+  $(form).append('<input type="hidden" name="cmdNoCheck" value="Cancel">');
+  swal({title:'Proceed?',text:'This will stop the running '+text+' operation',type:'warning',showCancelButton:true},function(p){if (p) form.submit(); else $('input[name="cmdNoCheck"]').remove();});
+}
+function pauseParity(form) {
+  $(form).append('<input type="hidden" name="cmdNoCheck" value="Pause">');
+  $('#pauseButton').val('Resume').prop('onclick',null).off('click').click(function(){resumeParity(form);});
+  form.submit();
+}
+function resumeParity(form) {
+  $(form).append('<input type="hidden" name="cmdCheck" value="Resume">');
+  $('#pauseButton').val('Pause').prop('onclick',null).off('click').click(function(){pauseParity(form);});
+  form.submit();
+}
+function shutdown_now(form,cmd) {
+  $(form).append('<input type="hidden" name="cmd" value="'+cmd+'">');
+  swal({title:'Proceed?',text:'This will '+cmd+' the system',type:'warning',showCancelButton:true},function(p){if (p) form.submit(); else $('input[name="cmd"]').remove();});
+}
+function toggleApply(checked) {
+  $('input[name="#apply"]').prop('disabled',!checked);
+}
+parityStatus();
+$('div[id=title]:not(":last, .disable_diskio")').each(function(){$(this).append(ctrl);});
+$('.tooltip_diskio').tooltipster({delay:100,trigger:'custom',triggerOpen:{mouseenter:true},triggerClose:{click:false,scroll:true,mouseleave:true}});
+toggle_diskio(true);
+$(function(){
+  var form = document.arrayOps;
+  if (form.input !== undefined) selectInput(form);
+});
+</script>
+
+<form name="arrayOps" method="POST" action="/update.htm" target="progressFrame">
+<input type="hidden" name="startState" value="STARTED">
+<input type="hidden" name="file" value="">
+<table class="array_status">
+    <tbody><tr><td><a class="info nohand" onclick="return false"><i class="fa fa-warning orb yellow-orb"></i><span>Started, array unprotected</span></a><span class="strong">Started</span></td>
+    <td><input type="button" value="Stop" onclick="stopArray(this.form)"></td>
+    <td id="stop"><strong>Stop</strong> will take the array off-line.</td></tr>
+          <tr><td></td><td><input type="submit" name="cmdCheck" value="Check"></td><td><strong>Check</strong> will start <strong>Read-Check</strong> of all array disks.</td></tr>
+        <tr><td></td><td><input type="button" value="History" onclick="openBox('/webGui/include/ParityHistory.php','Parity/Read-Check History',600,900,false)"></td>
+          <td>Last check completed on <strong>Thursday,  3 October 2019, 05:37 (fifteen days ago)</strong>, finding <strong>0</strong> errors.
+          <br><i class="fa fa-clock-o icon"></i><small>Duration: 2 days, 5 hours, 37 minutes, 30 seconds. Average speed: 51.8 MB/sec</small></td></tr>
+  <tr><td></td><td class="line" colspan="2"></td></tr>
+</tbody></table>
+<input type="hidden" name="csrf_token" value="1D84AB24441EAF74"></form>
+
+
+<table class="array_status noshift">
+ <tbody><tr><td></td><td><input type="button" id="button-down" onclick="$('[id^=button-]').prop('disabled',true);toggle_state('down')" value="Spin Down"><input type="button" id="button-up" onclick="$('[id^=button-]').prop('disabled',true);toggle_state('up')" value="Spin Up"></td>
+ <td><strong>Spin Down</strong> will immediately spin down all disks.<br><strong>Spin Up</strong> will immediately spin up all disks.</td></tr>
+ <tr><td></td><td><input type="button" value="Clear Statistics" onclick="toggle_state('Clear')"></td><td><strong>Clear Statistics</strong> will immediately clear all disk statistics.</td></tr>
+ <tr><td></td><td class="line" colspan="2"></td></tr>
+</tbody></table>
+
+
+<form name="mover_schedule" method="POST" action="/update.htm" target="progressFrame">
+<table class="array_status noshift">
+ <tbody><tr><td></td>
+ <td><input type="submit" name="cmdStartMover" value="Move now"></td><td><strong>Move now</strong> will immediately invoke the Mover.&nbsp;&nbsp;<a href="/Main/Scheduler">(Schedule)</a></td>
+ </tr>
+</tbody></table>
+<input type="hidden" name="csrf_token" value="1D84AB24441EAF74"></form>
+
+<p></p>
+
+<form name="shutdownOps" method="POST" action="/webGui/include/Boot.php">
+<table class="array_status noshift">
+ <tbody><tr><td></td><td><input type="button" name="reboot" value="Reboot" onclick="shutdown_now(this.form,'reboot')"><input type="button" name="shutdown" value="Power down" onclick="shutdown_now(this.form,'shutdown')"></td>
+ <td><strong>Reboot</strong> will activate a <em>clean</em> system reset.<br><strong>Power down</strong> will activate a <em>clean</em> power down.</td></tr>
+ <tr><td></td><td class="line" colspan="2"></td></tr>
+</tbody></table>
+<input type="hidden" name="csrf_token" value="1D84AB24441EAF74"></form>
+
+
+<blockquote class="inline_help" id="helpinfo3">
+  <p><strong>Colored Status Indicator</strong> the significance of the color indicator of the <em>Array</em> is as follows:</p>
+
+  <p><i class="fa fa-circle orb green-orb"></i>Array is Started and Parity is valid.</p>
+
+  <p><i class="fa fa-circle orb grey-orb"></i>Array is Stopped, Parity is valid.</p>
+
+  <p><i class="fa fa-warning orb yellow-orb"></i>Array is Started, but Parity is invalid.</p>
+
+  <p><i class="fa fa-warning orb grey-orb"></i>Array is Stopped, Parity is invalid.</p>
+</blockquote>
+
+<p></p>
+
+</div></div>
+<iframe id="progressFrame" name="progressFrame" frameborder="0"></iframe>
+<div id="footer"><span id="statusraid"><span id="statusbar"><span class="green strong"><i class="fa fa-play-circle"></i> Array Started</span></span></span><span id="countdown"></span><span id="user-notice" class="red-text"></span><span id="copyright">Unraid® webGui ©2019, Lime Technology, Inc. <a href="http://lime-technology.com/wiki/index.php/Official_Documentation" target="_blank" title="Online manual"><i class="fa fa-book"></i> manual</a></span></div><script>
+// Firefox specific workaround
+if (typeof InstallTrigger!=='undefined') $('#nav-block').addClass('mozilla');
+
+function parseINI(data){
+  var regex = {
+    section: /^\s*\[\s*\"*([^\]]*)\s*\"*\]\s*$/,
+    param: /^\s*([^=]+?)\s*=\s*\"*(.*?)\s*\"*$/,
+    comment: /^\s*;.*$/
+  };
+  var value = {};
+  var lines = data.split(/[\r\n]+/);
+  var section = null;
+  lines.forEach(function(line) {
+    if (regex.comment.test(line)) {
+      return;
+    } else if (regex.param.test(line)) {
+      var match = line.match(regex.param);
+      if (section) {
+        value[section][match[1]] = match[2];
+      } else {
+        value[match[1]] = match[2];
+      }
+    } else if (regex.section.test(line)) {
+      var match = line.match(regex.section);
+      value[match[1]] = {};
+      section = match[1];
+    } else if (line.length==0 && section) {
+      section = null;
+    };
+  });
+  return value;
+}
+// unraid animated logo
+var unraid_logo = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 133.52 76.97" class="unraid_mark"><defs><linearGradient id="unraid_logo" x1="23.76" y1="81.49" x2="109.76" y2="-4.51" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e32929"/><stop offset="1" stop-color="#ff8d30"/></linearGradient></defs><path d="m70,19.24zm57,0l6.54,0l0,38.49l-6.54,0l0,-38.49z" fill="url(#unraid_logo)" class="unraid_mark_9"/><path d="m70,19.24zm47.65,11.9l-6.55,0l0,-23.79l6.55,0l0,23.79z" fill="url(#unraid_logo)" class="unraid_mark_8"/><path d="m70,19.24zm31.77,-4.54l-6.54,0l0,-14.7l6.54,0l0,14.7z" fill="url(#unraid_logo)" class="unraid_mark_7"/><path d="m70,19.24zm15.9,11.9l-6.54,0l0,-23.79l6.54,0l0,23.79z" fill="url(#unraid_logo)" class="unraid_mark_6"/><path d="m63.49,19.24l6.51,0l0,38.49l-6.51,0l0,-38.49z" fill="url(#unraid_logo)" class="unraid_mark_5"/><path d="m70,19.24zm-22.38,26.6l6.54,0l0,23.78l-6.54,0l0,-23.78z" fill="url(#unraid_logo)" class="unraid_mark_4"/><path d="m70,19.24zm-38.26,43.03l6.55,0l0,14.73l-6.55,0l0,-14.73z" fill="url(#unraid_logo)" class="unraid_mark_3"/><path d="m70,19.24zm-54.13,26.6l6.54,0l0,23.78l-6.54,0l0,-23.78z" fill="url(#unraid_logo)" class="unraid_mark_2"/><path d="m70,19.24zm-63.46,38.49l-6.54,0l0,-38.49l6.54,0l0,38.49z" fill="url(#unraid_logo)" class="unraid_mark_1"/></svg>';
+
+var watchdog = new NchanSubscriber('/sub/var', /^((?!chrome|android).)*safari/i.test(navigator.userAgent) ? {subscriber:'longpoll'} : {});
+watchdog.on('message', function(data) {
+  var ini = parseINI(data);
+  var state = ini['fsState'];
+  var progress = ini['fsProgress'];
+  var status;
+  if (state=='Stopped') {
+    status = "<span class='red strong'><i class='fa fa-stop-circle'></i> Array Stopped</span>";
+  } else if (state=='Started') {
+    status = "<span class='green strong'><i class='fa fa-play-circle'></i> Array Started</span>";
+  } else if (state=='Formatting') {
+    status = "<span class='green strong'><i class='fa fa-play-circle'></i> Array Started</span>&bullet;<span class='orange strong'>Formatting device(s)</span>";
+  } else {
+    status = "<span class='orange strong'><i class='fa fa-pause-circle'></i> Array "+state+"</span>";
+  }
+  if (ini['mdResyncPos']>0) {
+    var action;
+    if (ini['mdResyncAction'].indexOf("recon")>=0) action = "Parity-Sync / Data-Rebuild";
+    else if (ini['mdResyncAction'].indexOf("clear")>=0) action = "Clearing";
+    else if (ini['mdResyncAction']=="check") action = "Read-Check";
+    else if (ini['mdResyncAction'].indexOf("check")>=0) action = "Parity-Check";
+    action += " "+(ini['mdResyncPos']/(ini['mdResyncSize']/100+1)).toFixed(1)+" %";
+    status += "&bullet;<span class='orange strong'>"+action.replace('.','.')+"</span>";
+    if (ini['mdResync']==0) status += "(Paused)";
+  }
+  if (progress) status += "&bullet;<span class='blue strong'>"+progress+"</span>";
+  $('#statusbar').html(status);
+});
+var backtotopoffset = 250;
+var backtotopduration = 500;
+$(window).scroll(function() {
+  if ($(this).scrollTop() > backtotopoffset) {
+    $('.back_to_top').fadeIn(backtotopduration);
+  } else {
+    $('.back_to_top').fadeOut(backtotopduration);
+  }
+  var top = $('div#header').height() - 1; // header height has 1 extra pixel to cover overlap
+  $('div#menu').css($(this).scrollTop() > top ? {position:'fixed',top:'0'} : {position:'absolute',top:top+'px'});
+});
+$('.back_to_top').click(function(event) {
+  event.preventDefault();
+  $('html,body').animate({scrollTop:0},backtotopduration);
+  return false;
+});
+$(function() {
+  $.post('/webGui/include/Notify.php',{cmd:'init'},function(){timers.notifier = setTimeout(notifier,0);});
+  $('input[value="Apply"],input[name="cmdEditShare"],input[name="cmdUserEdit"]').prop('disabled',true);
+  $('form').find('select,input[type=text],input[type=number],input[type=password],input[type=checkbox],input[type=radio],input[type=file],textarea').each(function(){$(this).on('input change',function() {
+    var form = $(this).parentsUntil('form').parent();
+    form.find('input[value="Apply"],input[name="cmdEditShare"],input[name="cmdUserEdit"]').not('input.lock').prop('disabled',false);
+    form.find('input[value="Done"]').not('input.lock').val('Reset').prop('onclick',null).off('click').click(function(){refresh(form.offset().top)});
+  });});
+
+  var top = ($.cookie('top')||0) - $('.tabs').offset().top - 75;
+  if (top>0) {$('html,body').scrollTop(top);}
+  $.removeCookie('top',{path:'/'});
+  if (location.pathname.search(/\/(AddVM|UpdateVM|AddContainer|UpdateContainer)/)==-1) {
+    $('blockquote.inline_help').each(function(i) {
+      $(this).attr('id','helpinfo'+i);
+      var pin = $(this).prev();
+      if (!pin.prop('nodeName')) pin = $(this).parent().prev();
+      while (pin.prop('nodeName') && pin.prop('nodeName').search(/(table|dl)/i)==-1) pin = pin.prev();
+      pin.find('tr:first,dt:last').each(function() {
+        var node = $(this);
+        var name = node.prop('nodeName').toLowerCase();
+        if (name=='dt') {
+          while (!node.html() || node.html().search(/(<input|<select|nbsp;)/i)>=0 || name!='dt') {
+            if (name=='dt' && node.is(':first-of-type')) break;
+            node = node.prev();
+            name = node.prop('nodeName').toLowerCase();
+          }
+          node.css('cursor','help').click(function(){$('#helpinfo'+i).toggle('slow');});
+        } else {
+          if (node.html() && (name!='tr' || node.children('td:first').html())) node.css('cursor','help').click(function(){$('#helpinfo'+i).toggle('slow');});
+        }
+      });
+    });
+  }
+  $('form').append($('<input>').attr({type:'hidden', name:'csrf_token', value:'1D84AB24441EAF74'}));
+  setTimeout(function(){$('div.spinner').each(function(){$(this).html(unraid_logo);});},150); // display animation if page loading takes longer than 150ms
+  watchdog.start();
+});
+</script>
+
+</div></div><div id="sb-container"><div id="sb-overlay"></div><div id="sb-wrapper"><a id="sb-nav-close" title="Close" onclick="Shadowbox.close()"></a><div id="sb-title"><div id="sb-title-inner"></div></div><div id="sb-wrapper-inner"><div id="sb-body"><div id="sb-body-inner"></div><div id="sb-loading"><div id="sb-loading-inner"><span>loading</span></div></div></div></div><div id="sb-info"><div id="sb-info-inner"><div id="sb-counter"></div><div id="sb-nav"><a id="sb-nav-next" title="Next" onclick="Shadowbox.next()"></a><a id="sb-nav-play" title="Play" onclick="Shadowbox.play()"></a><a id="sb-nav-pause" title="Pause" onclick="Shadowbox.pause()"></a><a id="sb-nav-previous" title="Previous" onclick="Shadowbox.previous()"></a></div></div></div></div></div></body></html>
