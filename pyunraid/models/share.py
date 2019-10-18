@@ -1,5 +1,6 @@
 class Share():
-
+    """The Share class represents a share on the Unraid server.
+    """
     def __init__(self):
         self.type = ''
         self.status = ''

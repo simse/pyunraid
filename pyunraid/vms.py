@@ -8,12 +8,7 @@ from pyunraid.constants import *
 from pyunraid.models.vm import VM
 
 
-def vms(u):
-
-    return parse_vms(u)
-
-
-def parse_vms(u):
+def _vms(u):
     # Parse containers page
     soup = BeautifulSoup(u.get('/plugins/dynamix.vm.manager/include/VMMachines.php').text, 'lxml')
     vms = []
@@ -41,7 +36,7 @@ def parse_vms(u):
         vm.memory = parse_size(vm_row.find_all('td')[3].text.replace('M', ' M'))
 
         # Find vdisks
-        vm.vdisks = find_vdisks(soup, vm_row['parent-id'])
+        vm.vdisks = _find_vdisks(soup, vm_row['parent-id'])
 
         # Find VNC port
         vm.vnc_port = vm_row.find_all('td')[5].text.replace('VNC:', '')
@@ -56,7 +51,7 @@ def parse_vms(u):
     return vms
 
 
-def find_vdisks(soup, index):
+def _find_vdisks(soup, index):
     vdisks = []
 
     row = soup.find(id="name-" + index)

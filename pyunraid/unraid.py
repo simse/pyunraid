@@ -4,16 +4,20 @@ from bs4 import BeautifulSoup
 
 from pyunraid.helpers import *
 from pyunraid.exceptions import *
-from pyunraid.disks import disks
-from pyunraid.containers import containers
-from pyunraid.vms import vms
-from pyunraid.shares import shares
-from pyunraid.users import users
-from pyunraid.plugins import plugins
-from pyunraid.notifications import notifications
+from pyunraid.disks import _disks
+from pyunraid.containers import _containers
+from pyunraid.vms import _vms
+from pyunraid.shares import _shares
+from pyunraid.users import _users
+from pyunraid.plugins import _plugins
+from pyunraid.notifications import _notifications
 
 
 class Unraid:
+    """The Unraid class represents an Unraid server and stores information
+    about the server, and methods to interact with it.
+    """
+
     SUPPORTED_VERSIONS = ['6.7.2']
     ARRAY_STATUS = {
         'Array Started': 'STARTED',
@@ -22,6 +26,7 @@ class Unraid:
     }
 
     def __init__(self, url, username='root', password=''):
+
         self.url = url
         self.username = username
         self.password = password
@@ -78,46 +83,46 @@ class Unraid:
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return disks(self)
+        return _disks(self)
 
 
     def containers(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return containers(self)
+        return _containers(self)
 
 
     def vms(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return vms(self)
+        return _vms(self)
 
 
     def shares(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return shares(self)
+        return _shares(self)
 
 
     def users(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return users(self)
+        return _users(self)
 
 
     def plugins(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return plugins(self)
+        return _plugins(self)
 
 
     def notifications(self):
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
-        return notifications(self)
+        return _notifications(self)

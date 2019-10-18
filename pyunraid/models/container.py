@@ -2,6 +2,12 @@ from pyunraid.helpers import *
 
 
 class Container():
+    """
+    Represents a Docker container on the Unraid server.
+
+    :ivar name: Container name
+    :ivar id: Container image ID
+    """
 
     def __init__(self):
         self.name = ''

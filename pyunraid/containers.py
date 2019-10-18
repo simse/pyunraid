@@ -10,12 +10,7 @@ from pyunraid.constants import *
 from pyunraid.models.container import Container
 
 
-def containers(u):
-
-    return parse_containers(u)
-
-
-def parse_containers(u):
+def _containers(u):
     # Parse containers page
     soup = BeautifulSoup(u.get('/plugins/dynamix.docker.manager/include/DockerContainers.php').text, 'lxml')
     containers = []
@@ -120,6 +115,7 @@ def parse_containers(u):
 
 
     return containers
+
 
 
 def _human_to_machine_time(input):

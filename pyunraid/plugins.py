@@ -13,11 +13,7 @@ PLUGIN_UPDATE_STATUS = {
 }
 
 
-def plugins(u):
-    return parse_plugins(u)
-
-
-def parse_plugins(u):
+def _plugins(u):
     # Parse containers page
     soup = BeautifulSoup(u.get('/plugins/dynamix.plugin.manager/include/ShowPlugins.php?check=0').text, 'lxml')
     #soup = BeautifulSoup(open('html/plugins.html', 'r'), 'lxml')

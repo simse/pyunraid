@@ -6,12 +6,11 @@ from pyunraid.constants import *
 from pyunraid.models.disk import Disk
 
 
-def disks(u):
+def _disks(u):
+    return _parse_devices(u, 'array') + _parse_devices(u, 'cache') + _parse_devices(u, 'flash')
 
-    return parse_devices(u, 'array') + parse_devices(u, 'cache') + parse_devices(u, 'flash')
 
-
-def parse_devices(unraid, device):
+def _parse_devices(unraid, device):
     payload = {
         'path': 'Main',
         'device': device
