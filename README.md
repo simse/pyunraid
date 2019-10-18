@@ -1,5 +1,7 @@
 # pyunraid
 
+[![Build Status](https://travis-ci.com/simse/pyunraid.svg?branch=master)](https://travis-ci.com/simse/pyunraid)
+
 Pyunraid is a Python library designed to interface directly with an Unraid server
 without installing any software on directly on the server.
 
