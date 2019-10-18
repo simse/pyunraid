@@ -30,7 +30,7 @@ def _vms(u):
         vm.state = vm_row.select("span.state")[0].text
 
         # Find CPU count
-        vm.cpu_count = vm_row.find_all('td')[2].text
+        vm.cpu_count = int(vm_row.find_all('td')[2].text)
 
         # Find memory amount
         vm.memory = parse_size(vm_row.find_all('td')[3].text.replace('M', ' M'))
