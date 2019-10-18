@@ -20,13 +20,8 @@ SHARE_SECURITY = {
 }
 
 
-def shares(unraid):
-
-    return parse_shares(unraid)
-
-
-def parse_shares(unraid):
-    # Parse containers page
+def _shares(unraid):
+    # Parse shares page
     soup = BeautifulSoup(unraid.get('/webGui/include/ShareList.php?compute=no&path=Shares&scale=-1&number=.%2C').text, 'lxml')
     shares = []
 

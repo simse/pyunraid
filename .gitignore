@@ -5,3 +5,5 @@ __pycache__
 dist
 .pytest_cache
 pyunraid.egg-info
+docs/_build
+web/docs

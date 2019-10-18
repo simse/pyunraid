@@ -7,10 +7,8 @@ from pyunraid.constants import *
 from pyunraid.models.notification import Notification
 
 
-def notifications(unraid):
+def _notifications(unraid):
     notifications = []
-
-    #print(unraid.post('/webGui/include/Notify.php', {'cmd':'get'}).text)
 
     for n in unraid.post('/webGui/include/Notify.php', {'cmd':'get'}).json():
         notification = Notification()

@@ -8,13 +8,8 @@ from pyunraid.constants import *
 from pyunraid.models.user import User
 
 
-def users(u):
-
-    return parse_users(u)
-
-
-def parse_users(u):
-    # Parse containers page
+def _users(u):
+    # Parse users page
     soup = BeautifulSoup(u.get('/Users').text, 'lxml')
     users = []
 
