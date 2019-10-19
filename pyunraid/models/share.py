@@ -38,6 +38,37 @@ class Share():
         pass
 
 
+    def _rename():
+        pass
+
+    def _comment():
+        pass
+
+    def _allocation_method():
+        pass
+
+    def _minimum_free_space():
+        pass
+
+    def _split_level():
+        pass
+
+    def _included_disks():
+        pass
+
+    def _excluded_disks():
+        pass
+
+    def _use_cache_disk():
+        pass
+
+    def _export(protocol):
+        pass
+
+    def _security(protocol, security):
+        pass
+
+
     def path(self, path = '/'):
         """List the directory in the share
 
@@ -86,35 +117,5 @@ class Share():
 
 
             path.append(p)
+
         return path
-
-
-    def rename():
-        pass
-
-    def comment():
-        pass
-
-    def allocation_method():
-        pass
-
-    def minimum_free_space():
-        pass
-
-    def split_level():
-        pass
-
-    def included_disks():
-        pass
-
-    def excluded_disks():
-        pass
-
-    def use_cache_disk():
-        pass
-
-    def export(protocol):
-        pass
-
-    def security(protocol, security):
-        pass

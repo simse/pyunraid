@@ -6,9 +6,9 @@ u = Unraid('192.168.0.4', 'root', PASSWORD)
 
 #print(u.vms())
 
-obj = u.shares()[0]
+obj = u.users()[0]
 
-print(obj.path())
+obj.set_image('image.png')
 
 #obj.destroy()
 
