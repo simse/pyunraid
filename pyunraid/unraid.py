@@ -3,6 +3,7 @@ import re
 from bs4 import BeautifulSoup
 
 from pyunraid.helpers import *
+from pyunraid.constants import *
 from pyunraid.exceptions import *
 from pyunraid.disks import _disks
 from pyunraid.containers import _containers
@@ -18,14 +19,17 @@ class Unraid:
     about the server, and methods to interact with it.
     """
 
+    #: Unraid server versions supported by this minor version. For each Unraid
+    #: version that requires an update in pyunraid, there will be a minor
+    #: version bump. For each major Unraid release, there will be a major
+    #: version bump.
     SUPPORTED_VERSIONS = ['6.7.2']
-    ARRAY_STATUS = {
-        'Array Started': 'STARTED',
-        'Array Stopped': 'STOPPED',
-        'Array Stopping&bullet;Stopping services...': 'STOPPING'
-    }
 
     def __init__(self, url, username='root', password=''):
+        # Check schema is supplied, fall back to HTTP if not
+        if 'http://' not in url:
+            url = 'http://' + url
+
         self.url = url
         self.username = username
         self.password = password
@@ -37,11 +41,10 @@ class Unraid:
         self.license = ''
         self.array_status = ''
 
-        if 'http://' not in self.url:
-            self.url = 'http://' + self.url
+
 
         self.u = {
-            'url': url,
+            'url': self.url,
             'username': username,
             'password': password,
             'csfr_token': self.csfr_token
@@ -54,10 +57,21 @@ class Unraid:
 
 
     def get(self, url):
+        """Sends a GET request to the server with correct headers and authentication.
+
+        :param url: Path to send request to, it's automatically appended to the server URL.
+        :returns: Requests object
+        """
         return get(self.u, self.u['url'] + url)
 
 
     def post(self, url, payload={}):
+        """Sends a POST request to the server with correct headers and authentication.
+
+        :param url: Path to send request to, it's automatically appended to the server URL.
+        :param payload: Payload to send.
+        :returns: Requests object
+        """
         return post(self.u, self.u['url'] + url, payload)
 
 
@@ -66,7 +80,6 @@ class Unraid:
 
         # Find server version
         self.version = re.findall(r'Version: ([0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2})', server_page.find(class_='logo').text)[0]
-
 
         # Find server name
         self.name = server_page.select('span.text-right')[0].text.split(' &bullet;')[0]
@@ -78,10 +91,11 @@ class Unraid:
         self.description = str(server_page.select('span.text-right')[0]).split('<br/>')[1]
 
         # Find array status
-        self.array_status = self.ARRAY_STATUS[server_page.find(id="statusbar").text.strip()]
+        self.array_status = ARRAY_STATUS[server_page.find(id="statusbar").text.strip()]
 
 
     def disks(self):
+        """Get a list of :class:`disks <pyunraid.models.disk>` connected to the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
@@ -89,6 +103,7 @@ class Unraid:
 
 
     def containers(self):
+        """Get a list of :class:`containers <pyunraid.models.container>` running on the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
@@ -96,6 +111,7 @@ class Unraid:
 
 
     def vms(self):
+        """Get a list of :class:`VMs <pyunraid.models.vm>` running on the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
@@ -103,6 +119,7 @@ class Unraid:
 
 
     def shares(self):
+        """Get a list of :class:`shares <pyunraid.models.share>` on the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
@@ -110,6 +127,7 @@ class Unraid:
 
 
     def users(self):
+        """Get a list of :class:`users <pyunraid.models.user>` on the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
@@ -117,6 +135,7 @@ class Unraid:
 
 
     def plugins(self):
+        """Get a list of :class:`plugins <pyunraid.models.plugin>` on the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
@@ -124,6 +143,7 @@ class Unraid:
 
 
     def notifications(self):
+        """Get a list of :class:`notifications <pyunraid.models.notification>` on the server."""
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 

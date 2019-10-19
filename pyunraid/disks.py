@@ -47,17 +47,9 @@ def parse_disk_row(row):
 
     # Find disk status
     status_span = row.find_all('span')[0].get_text()
-    status = {
-        DISK_STATUS_ACTIVE: 'active',
-        DISK_STATUS_INACTIVE: 'inactive',
-        DISK_STATUS_EMULATED: 'emulated',
-        DISK_STATUS_DISABLED: 'disabled',
-        DISK_STATUS_NEW: 'new',
-        DISK_STATUS_EMPTY: 'empty'
-    }
 
     try:
-        disk.status = status[status_span]
+        disk.status = DISK_STATUS[status_span]
     except KeyError:
         disk.status = None
 

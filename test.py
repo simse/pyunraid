@@ -2,11 +2,13 @@ from pyunraid.unraid import Unraid
 
 PASSWORD = 'hotfla123As'
 
-u = Unraid('http://192.168.0.4', 'root', PASSWORD)
+u = Unraid('192.168.0.4', 'root', PASSWORD)
 
 #print(u.vms())
 
-obj = u.vms()[1]
+obj = u.shares()[0]
+
+print(obj.path())
 
 #obj.destroy()
 
