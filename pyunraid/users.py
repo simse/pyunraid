@@ -8,9 +8,9 @@ from pyunraid.constants import *
 from pyunraid.models.user import User
 
 
-def _users(u):
+def _users(unraid):
     # Parse users page
-    soup = BeautifulSoup(u.get('/Users').text, 'lxml')
+    soup = BeautifulSoup(unraid.get('/Users').text, 'lxml')
     users = []
 
     for user in soup.select('div.user-list'):
@@ -26,9 +26,10 @@ def _users(u):
         else:
             u.name = user.find('a').text.replace(u.description, '')
 
-
         # Find image
         u.image = user.find('img')['src']
+
+        u._unraid = unraid
 
         users.append(u)
 
