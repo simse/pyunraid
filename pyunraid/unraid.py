@@ -26,7 +26,6 @@ class Unraid:
     }
 
     def __init__(self, url, username='root', password=''):
-
         self.url = url
         self.username = username
         self.password = password
@@ -37,6 +36,9 @@ class Unraid:
         self.description = ''
         self.license = ''
         self.array_status = ''
+
+        if 'http://' not in self.url:
+            self.url = 'http://' + self.url
 
         self.u = {
             'url': url,
