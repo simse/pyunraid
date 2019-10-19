@@ -55,6 +55,9 @@ class Unraid:
         if not self.version in self.SUPPORTED_VERSIONS:
             print('This server version is NOT supported!!')
 
+    def reboot(self):
+        """Reboots the unraid server."""
+        return self.post('/webGui/include/Boot.php', {'cmd': 'reboot'})
 
     def get(self, url):
         """Sends a GET request to the server with correct headers and authentication.
