@@ -38,6 +38,12 @@ def post(u, url, payload={}):
 def parse_size(size):
     units = {"B": 1, "KB": 10 ** 3, "MB": 10 ** 6, "GB": 10 ** 9, "TB": 10 ** 12, "K": 10 ** 3, "M": 10 ** 6, "G": 10 ** 9, "T": 10 ** 12}
 
+    if size == 'unknown':
+        return 0
+
+    if size == '<DIR>':
+        return 0
+
     number, unit = [string.strip() for string in size.split()]
     return int(float(number)*units[unit])
 

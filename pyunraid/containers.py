@@ -3,7 +3,6 @@ import datetime
 
 import requests
 from bs4 import BeautifulSoup
-from timefhuman import timefhuman
 
 from pyunraid.helpers import *
 from pyunraid.constants import *

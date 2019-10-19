@@ -46,6 +46,8 @@ def _shares(unraid):
         # Find free space
         s.free_size = parse_size(share.find_all('td')[6].text)
 
+        s._unraid = unraid
+
         shares.append(s)
 
     return shares

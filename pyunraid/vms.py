@@ -62,8 +62,8 @@ def _find_vdisks(soup, index):
             {
                 'path': row.find_all('td')[0].text,
                 'bus': row.find_all('td')[1].text,
-                'capacity': parse_size(_add_space(row.find_all('td')[2].text)),
-                'allocation': parse_size(_add_space(row.find_all('td')[3].text))
+                'capacity': parse_size(_add_space(row.find_all('td')[2].text.strip())),
+                'allocation': parse_size(_add_space(row.find_all('td')[3].text.strip()))
             }
         )
 

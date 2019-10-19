@@ -1,6 +1,18 @@
-DISK_STATUS_ACTIVE = 'Normal operation, device is active'
-DISK_STATUS_INACTIVE = 'Device is in standby mode (spun-down)'
-DISK_STATUS_EMULATED = 'Device contents emulated'
-DISK_STATUS_DISABLED = 'Device is disabled, contents emulated',
-DISK_STATUS_NEW = 'New device'
-DISK_STATUS_EMPTY = 'No device present, position is empty'
+"""The constants module stores constants to ensure consistency for certain status properties across versions.
+
+"""
+
+DISK_STATUS = {
+    'Normal operation, device is active': 'ACTIVE',
+    'Device is in standby mode (spun-down)': 'INACTIVE',
+    'Device contents emulated': 'EMULATED',
+    'Device is disabled, contents emulated': 'DISABLED',
+    'New device': 'NEW',
+    'No device present, position is empty': 'EMPTY'
+}
+
+ARRAY_STATUS = {
+    'Array Started': 'STARTED',
+    'Array Stopped': 'STOPPED',
+    'Array Stopping&bullet;Stopping services...': 'STOPPING'
+}

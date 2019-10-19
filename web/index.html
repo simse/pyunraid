@@ -1,1 +1,42 @@
-<h1>Welcome to pyunraid</h1>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>pyunraid - A Python module to control Unraid</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:900&display=swap" rel="stylesheet">
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
+
+    <body>
+        <div class="hero">
+            <div class="hero-inner">
+                <h1 class="title">pyunraid</h1>
+
+                <h2 class="subtitle">A Python module to control Unraid servers</h2>
+            </div>
+        </div>
+
+        <div class="section install">
+            <h2>Installation</h2>
+
+            <p>To install pyunraid just run <code>pip install pyunraid</code>. Just make sure to install the correct version for your server.</p>
+        </div>
+
+        <div class="section usage">
+            <h2>Usage</h2>
+
+            <p>Here's a small quick start snippet.</p>
+
+            <iframe
+              src="https://carbon.now.sh/embed/?bg=rgba(74%2C144%2C226%2C0)&t=seti&wt=none&l=auto&ds=false&dsyoff=20px&dsblur=68px&wc=true&wa=true&pv=52px&ph=58px&ln=false&fl=1&fm=Fira%20Code&fs=14px&lh=152%25&si=false&es=2x&wm=false&code=from%2520pyunraid%2520import%2520Unraid%250A%250A%2523%2520Connect%2520to%2520Unraid%2520server%250Aunraid%2520%253D%2520Unraid('192.168.0.4'%252C%2520USERNAME%252C%2520PASSWORD)%250A%250A%2523%2520Get%2520all%2520Docker%2520containers%250Acontainers%2520%253D%2520unraid.containers()%250A%250A%2523%2520Restart%2520all%2520containers%250Afor%2520container%2520in%2520containers%253A%250A%2520%2520container.restart()"
+              style="width:1200px; height:450px; border:0; overflow:hidden;"
+              sandbox="allow-scripts allow-same-origin">
+            </iframe>
+        </div>
+
+        <div class="section docs">
+            <h2>Documentation</h2>
+
+            <p>You can read the full, auto-generated documentation <a href="docs/">here.</a></p>
+        </div>
+    </body>
+</html>
