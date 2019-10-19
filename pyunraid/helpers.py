@@ -14,7 +14,7 @@ def get_csfr_token(url, username, password):
     if unraid_page.status_code is not 200:
         raise ConnectionError
 
-    search = re.search('([csfr_token=]{11})([A-Z,1-9]{16})', unraid_page.text)
+    search = re.search('([csfr_token=]{11})([A-Z,0-9]{16})', unraid_page.text)
     csfr_token = search.group(2)
 
     return csfr_token
