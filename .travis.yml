@@ -8,6 +8,7 @@ install:
 - pip install -e .
 script:
 - pytest
+- flake8
 deploy:
   provider: pypi
   twine_version: 1.12.1

@@ -19,11 +19,11 @@ class Plugin():
         self.version = ''
         self.unraid = None
 
-
     def _uninstall(self):
         pass
 
-
     def _release_notes(self):
         pass
-        #return self.unraid.get("/plugins/dynamix.plugin.manager/include/ShowChanges.php?file=%2Ftmp%2Fplugins%2F{}.txt".format(self.name)).text
+        # return self.unraid.get("/plugins/dynamix.plugin.manager/include/
+        # ShowChanges.php
+        # ?file=%2Ftmp%2Fplugins%2F{}.txt".format(self.name)).text

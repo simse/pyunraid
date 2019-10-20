@@ -18,10 +18,12 @@ class Notification():
         self.file = ''
         self.unraid = None
 
-
     def dismiss(self):
         """Dismiss the notification.
 
         :returns: void
         """
-        self.unraid.post('/webGui/include/Notify.php', {'cmd':'archive', 'file':self.file})
+        self.unraid.post(
+            '/webGui/include/Notify.php',
+            {'cmd': 'archive', 'file': self.file}
+        )

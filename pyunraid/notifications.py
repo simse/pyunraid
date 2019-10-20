@@ -1,16 +1,12 @@
 import json
 
-import requests
-
-from pyunraid.helpers import *
-from pyunraid.constants import *
 from pyunraid.models.notification import Notification
 
 
 def _notifications(unraid):
     notifications = []
 
-    for n in unraid.post('/webGui/include/Notify.php', {'cmd':'get'}).json():
+    for n in unraid.post('/webGui/include/Notify.php', {'cmd': 'get'}).json():
         notification = Notification()
 
         n = json.loads(n)

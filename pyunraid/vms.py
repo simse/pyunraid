@@ -1,16 +1,15 @@
-import re
-
-import requests
 from bs4 import BeautifulSoup
 
-from pyunraid.helpers import *
-from pyunraid.constants import *
+from pyunraid.helpers import parse_size
 from pyunraid.models.vm import VM
 
 
 def _vms(u):
     # Parse containers page
-    soup = BeautifulSoup(u.get('/plugins/dynamix.vm.manager/include/VMMachines.php').text, 'lxml')
+    soup = BeautifulSoup(
+        u.get('/plugins/dynamix.vm.manager/include/VMMachines.php').text,
+        'lxml'
+    )
     vms = []
 
     # Loop through each VM
@@ -33,7 +32,9 @@ def _vms(u):
         vm.cpu_count = int(vm_row.find_all('td')[2].text)
 
         # Find memory amount
-        vm.memory = parse_size(vm_row.find_all('td')[3].text.replace('M', ' M'))
+        vm.memory = parse_size(
+            vm_row.find_all('td')[3].text.replace('M', ' M')
+        )
 
         # Find vdisks
         vm.vdisks = _find_vdisks(soup, vm_row['parent-id'])
@@ -42,7 +43,8 @@ def _vms(u):
         vm.vnc_port = vm_row.find_all('td')[5].text.replace('VNC:', '')
 
         # Find autostart status
-        vm.autostart = vm_row.find_all('td')[6].find_all("input")[0].has_attr('checked')
+        vm.autostart = vm_row.find_all('td')[6].find_all("input")[0] \
+            .has_attr('checked')
 
         vm.unraid = u
 
@@ -62,8 +64,12 @@ def _find_vdisks(soup, index):
             {
                 'path': row.find_all('td')[0].text,
                 'bus': row.find_all('td')[1].text,
-                'capacity': parse_size(_add_space(row.find_all('td')[2].text.strip())),
-                'allocation': parse_size(_add_space(row.find_all('td')[3].text.strip()))
+                'capacity': parse_size(
+                    _add_space(row.find_all('td')[2].text.strip())
+                ),
+                'allocation': parse_size(
+                    _add_space(row.find_all('td')[3].text.strip())
+                )
             }
         )
 

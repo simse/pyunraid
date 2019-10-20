@@ -1,13 +1,16 @@
-import requests
+import re
+
 from bs4 import BeautifulSoup
 
-from pyunraid.helpers import *
-from pyunraid.constants import *
+from pyunraid.helpers import parse_size, parse_speed
+from pyunraid.constants import DISK_STATUS
 from pyunraid.models.disk import Disk
 
 
 def _disks(u):
-    return _parse_devices(u, 'array') + _parse_devices(u, 'cache') + _parse_devices(u, 'flash')
+    return _parse_devices(u, 'array') + \
+           _parse_devices(u, 'cache') + \
+           _parse_devices(u, 'flash')
 
 
 def _parse_devices(unraid, device):
@@ -16,7 +19,10 @@ def _parse_devices(unraid, device):
         'device': device
     }
 
-    parsed_page = BeautifulSoup(unraid.post('/webGui/include/DeviceList.php', payload).text, features="lxml")
+    parsed_page = BeautifulSoup(
+        unraid.post('/webGui/include/DeviceList.php', payload).text,
+        features="lxml"
+    )
     rows = parsed_page.find_all('tr')
     disks = []
 
@@ -35,7 +41,7 @@ def parse_disk_row(row):
     disk.disk_type = "hdd"
 
     # Remove empty rows
-    if row.get_text() is '':
+    if row.get_text() == '':
         return None
 
     # Remove last status row
@@ -55,7 +61,7 @@ def parse_disk_row(row):
 
     # Find disk name
     name_a = row.find_all('a')[1]
-    disk.name= name_a.get_text()
+    disk.name = name_a.get_text()
 
     # Find storage type
     if disk.name == 'Parity':
@@ -84,16 +90,23 @@ def parse_disk_row(row):
     else:
         disk.temperature = int(temp_td.strip(' C'))
 
-
     # Find disk read statistics
     read_td = row.find_all('td')[3]
-    disk.current_read_speed = parse_speed(read_td.find_all('span')[0].get_text())
-    disk.current_read_count = int(read_td.find_all('span')[1].get_text().replace(',', ''))
+    disk.current_read_speed = parse_speed(
+        read_td.find_all('span')[0].get_text()
+    )
+    disk.current_read_count = int(
+        read_td.find_all('span')[1].get_text().replace(',', '')
+    )
 
     # Find disk write statistics
     read_td = row.find_all('td')[4]
-    disk.current_write_speed = parse_speed(read_td.find_all('span')[0].get_text())
-    disk.current_write_count = int(read_td.find_all('span')[1].get_text().replace(',', ''))
+    disk.current_write_speed = parse_speed(
+        read_td.find_all('span')[0].get_text()
+    )
+    disk.current_write_count = int(
+        read_td.find_all('span')[1].get_text().replace(',', '')
+    )
 
     # Find disk errors
     error_td = row.find_all('td')[5]

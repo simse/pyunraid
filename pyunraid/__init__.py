@@ -1,1 +1,1 @@
-from pyunraid.unraid import Unraid
+from pyunraid.unraid import Unraid # noqa

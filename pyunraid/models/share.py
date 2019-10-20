@@ -48,7 +48,8 @@ class Share():
         old_name = self.name
         self.name = name
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'shareNameOrig': old_name,
                 'shareName': name,
@@ -63,7 +64,8 @@ class Share():
         """
         self.comment = comment
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'shareComment': comment,
                 'cmdEditShare': 'Apply'
@@ -76,7 +78,8 @@ class Share():
         :param comment: The new comment.
         """
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'shareAllocator': method,
                 'cmdEditShare': 'Apply'
@@ -89,7 +92,8 @@ class Share():
         :param floor: Minimum free space in bytes
         """
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'shareFloor': floor,
                 'cmdEditShare': 'Apply'
@@ -103,7 +107,8 @@ class Share():
         only split top level dir and 0 is no splitting.
         """
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'shareSplitLevel': split,
                 'cmdEditShare': 'Apply'
@@ -122,7 +127,8 @@ class Share():
         :param use_cache: 'yes' for yes and 'no' for no
         """
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'shareUseCache': use_cache,
                 'cmdEditShare': 'Apply'

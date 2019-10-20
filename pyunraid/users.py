@@ -1,10 +1,5 @@
-import re
-
-import requests
 from bs4 import BeautifulSoup
 
-from pyunraid.helpers import *
-from pyunraid.constants import *
 from pyunraid.models.user import User
 
 

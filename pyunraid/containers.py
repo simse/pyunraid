@@ -1,17 +1,17 @@
 import re
-import datetime
 
-import requests
 from bs4 import BeautifulSoup
 
-from pyunraid.helpers import *
-from pyunraid.constants import *
 from pyunraid.models.container import Container
 
 
 def _containers(u):
     # Parse containers page
-    soup = BeautifulSoup(u.get('/plugins/dynamix.docker.manager/include/DockerContainers.php').text, 'lxml')
+    soup = BeautifulSoup(
+        u.get('/plugins/dynamix.docker.manager/include/ \
+            DockerContainers.php').text,
+        'lxml'
+    )
     containers = []
 
     # Loop through each table row
@@ -39,7 +39,6 @@ def _containers(u):
             .replace('-', '_') \
             .replace(' ', '_')
 
-
         # Get image tag
         c.tag = container.find(class_="updatecolumn") \
             .find_all("div")[1] \
@@ -57,7 +56,9 @@ def _containers(u):
         for group in span.split('<br/>'):
             port_mapping = []
 
-            for ip in group.split('<i class="fa fa-arrows-h" style="margin:0 6px"></i>'):
+            for ip in group.split(
+                '<i class="fa fa-arrows-h" style="margin:0 6px"></i>'
+            ):
                 port_mapping.append(int(re.findall(r':([0-9]{1,5})', ip)[0]))
 
             c.port_mappings.append(port_mapping)
@@ -70,20 +71,25 @@ def _containers(u):
         for group in span.split('<br/>'):
             path_mapping = []
 
-            for path in group.split('<i class="fa fa-arrows-h" style="margin:0 6px"></i>'):
+            for path in group.split(
+                '<i class="fa fa-arrows-h" style="margin:0 6px"></i>'
+            ):
                 path_mapping.append(path.strip())
 
             c.path_mappings.append(path_mapping)
 
         # Find startup delay
-        c.startup_delay = container.find_all('td')[6].find_all('input')[1]['value']
+        c.startup_delay = container.find_all('td')[6] \
+            .find_all('input')[1]['value']
 
         if not c.startup_delay:
             c.startup_delay = 0
 
         # Find uptime
-        uptime = re.search(r'Uptime ([0-9]{1,3}) (hours|days|weeks)', \
-            container.find_all('td')[7].find_all('div')[0].text)
+        uptime = re.search(
+            r'Uptime ([0-9]{1,3}) (hours|days|weeks)',
+            container.find_all('td')[7].find_all('div')[0].text
+        )
 
         if not uptime:
             c.uptime = 0
@@ -93,8 +99,10 @@ def _containers(u):
             c.uptime = _human_to_machine_time(match)
 
         # Find age
-        age = re.search(r'Created ([0-9]{1,3}) (hours|days|weeks)', \
-            container.find_all('td')[7].find_all('div')[1].text)
+        age = re.search(
+            r'Created ([0-9]{1,3}) (hours|days|weeks)',
+            container.find_all('td')[7].find_all('div')[1].text
+        )
 
         if not age:
             c.age = 0
@@ -113,9 +121,7 @@ def _containers(u):
 
         containers.append(c)
 
-
     return containers
-
 
 
 def _human_to_machine_time(input):

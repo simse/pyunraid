@@ -1,10 +1,5 @@
-import re
-
-import requests
 from bs4 import BeautifulSoup
 
-from pyunraid.helpers import *
-from pyunraid.constants import *
 from pyunraid.models.plugin import Plugin
 
 
@@ -15,7 +10,11 @@ PLUGIN_UPDATE_STATUS = {
 
 def _plugins(u):
     # Parse containers page
-    soup = BeautifulSoup(u.get('/plugins/dynamix.plugin.manager/include/ShowPlugins.php?check=1').text, 'lxml')
+    soup = BeautifulSoup(
+        u.get('/plugins/dynamix.plugin.manager/include/ShowPlugins.php \
+            ?check=1').text,
+        'lxml'
+    )
     plugins = []
 
     for plugin in soup.find_all('tr'):
@@ -36,7 +35,6 @@ def _plugins(u):
         else:
             p.name = plugin.select('.desc_readmore strong')[0].text
             p.description = plugin.select('.desc_readmore p')[1].text
-
 
         # Find plugin support thread
         p.support_thread = plugin.find_all('a')[1]['href']

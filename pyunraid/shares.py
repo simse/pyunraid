@@ -1,10 +1,6 @@
-import re
-
-import requests
 from bs4 import BeautifulSoup
 
-from pyunraid.helpers import *
-from pyunraid.constants import *
+from pyunraid.helpers import parse_size
 from pyunraid.models.share import Share
 
 
@@ -22,7 +18,13 @@ SHARE_SECURITY = {
 
 def _shares(unraid):
     # Parse shares page
-    soup = BeautifulSoup(unraid.get('/webGui/include/ShareList.php?compute=no&path=Shares&scale=-1&number=.%2C').text, 'lxml')
+    soup = BeautifulSoup(
+        unraid.get(
+            '/webGui/include/ShareList.php \
+            ?compute=no&path=Shares&scale=-1&number=.%2C'
+        ).text,
+        'lxml'
+    )
     shares = []
 
     for share in soup.find_all('tr'):

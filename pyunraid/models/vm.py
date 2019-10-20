@@ -1,6 +1,3 @@
-from pyunraid.helpers import *
-
-
 class VM:
     """The VM class represents a VM on the Unraid server.
 
@@ -63,7 +60,7 @@ class VM:
         return self._domain('domain-delete')
 
     # Internal functions
-    def _domain(self, action, payload = {}):
+    def _domain(self, action, payload={}):
         unraid = self.unraid
 
         payload = {**{
@@ -72,7 +69,10 @@ class VM:
             'response': 'json'
         }, **payload}
 
-        response_code = unraid.post('/plugins/dynamix.vm.manager/include/VMajax.php', payload).status_code
+        response_code = unraid.post(
+            '/plugins/dynamix.vm.manager/include/VMajax.php',
+            payload
+        ).status_code
 
         if response_code == 200:
             return 'OK'

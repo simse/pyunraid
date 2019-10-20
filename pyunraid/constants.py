@@ -1,4 +1,5 @@
-"""The constants module stores constants to ensure consistency for certain status properties across versions.
+"""The constants module stores constants to ensure consistency for certain
+status properties across versions.
 
 """
 

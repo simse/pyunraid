@@ -1,7 +1,7 @@
 import base64
 import ntpath
-import codecs
 from os import path
+
 
 class User():
     """The User class represents a user on the Unraid server
@@ -17,7 +17,6 @@ class User():
         self.image = ''
         self._unraid = None
 
-
     def set_description(self, description):
         """Set the description of the user.
 
@@ -25,14 +24,14 @@ class User():
         """
         self.description = description
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'userName': self.name,
                 'userDesc': description,
                 'cmdUserEdit': 'Apply'
             }
         ).status_code
-
 
     def set_image(self, image):
         """Set the profile picture of the user."""
@@ -43,7 +42,8 @@ class User():
         filename = ntpath.basename(image)
 
         # Upload the image
-        self._unraid.post('/webGui/include/FileUpload.php',
+        self._unraid.post(
+            '/webGui/include/FileUpload.php',
             {
                 'filename': filename,
                 'filedata': encoded
@@ -51,7 +51,8 @@ class User():
         )
 
         # Assign image
-        self._unraid.post('/webGui/include/FileUpload.php',
+        self._unraid.post(
+            '/webGui/include/FileUpload.php',
             {
                 'cmd': 'save',
                 'path': '/boot/config/plugins/dynamix/users',
@@ -61,7 +62,8 @@ class User():
         )
 
         # Apply changes
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'userName': self.name,
                 'userDesc': self.description,
@@ -69,13 +71,13 @@ class User():
             }
         ).status_code
 
-
     def delete(self):
         """Delete the user."""
         if self.name == 'root':
             return 403
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'userName': self.name,
                 'userDesc': self.description,
@@ -83,7 +85,6 @@ class User():
                 'cmdUserEdit': 'Delete'
             }
         ).status_code
-
 
     def set_password(self, password):
         """Set a new password
@@ -93,7 +94,8 @@ class User():
         if self.name == 'root':
             return 403
 
-        return self._unraid.post('/update.htm',
+        return self._unraid.post(
+            '/update.htm',
             {
                 'userName': self.name,
                 'userPassword': password,

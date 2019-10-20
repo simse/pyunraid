@@ -1,11 +1,14 @@
 class Disk():
-    """The Disk class represents a harddrive, SSD or flash drive connected to the Unraid server
+    """The Disk class represents a harddrive, SSD or flash drive connected to
+    the Unraid server
 
     :ivar disk_type: Whether disk is HDD, SSD or USB
-    :ivar status: The status of the disk (active, inactive, emulated, disabled, new, empty)
+    :ivar status: The status of the disk (active, inactive, emulated, disabled,
+    new, empty)
     :ivar name: The name of the disk
     :ivar type: The array the disk is in (array, cache or boot)
-    :ivar identification: The identification string for the disk, usually includes the serial number
+    :ivar identification: The identification string for the disk, usually
+    includes the serial number
     :ivar mount: The UNIX mount (e.g. /dev/sdc)
     :ivar size: The size in bytes
     :ivar temperature: The temperature in Celsius
@@ -36,14 +39,11 @@ class Disk():
         self.space_used = 0
         self.space_available = 0
 
-
     def _smart():
         pass
 
-
     def _logs():
         pass
-
 
     def _identity():
         pass
