@@ -20,7 +20,7 @@ def _shares(unraid):
     # Parse shares page
     soup = BeautifulSoup(
         unraid.get(
-            '/webGui/include/ShareList.php?compute=no&path=Shares&scale=-1' + \
+            '/webGui/include/ShareList.php?compute=no&path=Shares&scale=-1' +
             '&number=.%2C'
         ).text,
         'lxml'
