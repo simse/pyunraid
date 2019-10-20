@@ -60,7 +60,12 @@ def _containers(u):
             for ip in group.split(
                 '<i class="fa fa-arrows-h" style="margin:0 6px"></i>'
             ):
-                port_mapping.append(int(re.findall(r':([0-9]{1,5})', ip)[0]))
+                try:
+                    port_mapping.append(
+                        int(re.findall(r':([0-9]{1,5})', ip)[0])
+                    )
+                except IndexError:
+                    pass
 
             c.port_mappings.append(port_mapping)
 
