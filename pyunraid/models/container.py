@@ -33,7 +33,14 @@ class Container():
         self.startup_delay = 0
         self.uptime = 0
         self.age = 0
-        self.unraid = None
+        self.__unraid = None
+
+    def action(self, action):
+        """Send action to Unraid for specific container.
+
+        :params action: Action to send (e.g. start, restart, stop)
+        """
+        return self._action(action)
 
     def start(self):
         """Starts the Docker container."""
@@ -86,9 +93,12 @@ class Container():
         pass
 
     # Internal functions
+    def _set_unraid(self, unraid):
+        self.__unraid = unraid
+
     def _action(self, action, payload={},
                 url='/plugins/dynamix.docker.manager/include/Events.php'):
-        unraid = self.unraid
+        unraid = self.__unraid
 
         payload = {**{
             'action': action,

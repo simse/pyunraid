@@ -15,7 +15,7 @@ class User():
         self.name = ''
         self.description = ''
         self.image = ''
-        self._unraid = None
+        self.___unraid = None
 
     def set_description(self, description):
         """Set the description of the user.
@@ -24,7 +24,7 @@ class User():
         """
         self.description = description
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'userName': self.name,
@@ -42,7 +42,7 @@ class User():
         filename = ntpath.basename(image)
 
         # Upload the image
-        self._unraid.post(
+        self.__unraid.post(
             '/webGui/include/FileUpload.php',
             {
                 'filename': filename,
@@ -51,7 +51,7 @@ class User():
         )
 
         # Assign image
-        self._unraid.post(
+        self.__unraid.post(
             '/webGui/include/FileUpload.php',
             {
                 'cmd': 'save',
@@ -62,7 +62,7 @@ class User():
         )
 
         # Apply changes
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'userName': self.name,
@@ -76,7 +76,7 @@ class User():
         if self.name == 'root':
             return 403
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'userName': self.name,
@@ -94,7 +94,7 @@ class User():
         if self.name == 'root':
             return 403
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'userName': self.name,
@@ -104,3 +104,6 @@ class User():
                 'cmdUserEdit': 'Change'
             }
         ).status_code
+
+    def _set_unraid(self, unraid):
+        self.__unraid = unraid

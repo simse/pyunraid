@@ -46,7 +46,7 @@ def _vms(u):
         vm.autostart = vm_row.find_all('td')[6].find_all("input")[0] \
             .has_attr('checked')
 
-        vm.unraid = u
+        vm._set_unraid(u)
 
         vms.append(vm)
 

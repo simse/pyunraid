@@ -49,7 +49,7 @@ def _plugins(u):
         # Find plugin update status
         p.update_status = PLUGIN_UPDATE_STATUS[plugin.find_all('td')[4].text]
 
-        p.unraid = u
+        p._set_unraid(u)
 
         plugins.append(p)
 

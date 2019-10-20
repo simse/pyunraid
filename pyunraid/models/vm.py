@@ -21,7 +21,16 @@ class VM:
         self.vnc_port = 0
         self.autostart = False
         self.state = ''
-        self.unraid = None
+        self.__unraid = None
+
+    def action(self, action):
+        """Send action to Unraid for specific VM.
+
+        :param action: Action to send (e.g. start, stop)
+        .. warning:: Please check you're sending a supported action, 'start' is
+        not correct, 'domain-start' is.
+        """
+        return self._domain(action)
 
     def disable_autostart(self):
         """Disable autostart of the VM."""
@@ -60,8 +69,11 @@ class VM:
         return self._domain('domain-delete')
 
     # Internal functions
+    def _set_unraid(self, unraid):
+        self.__unraid = unraid
+
     def _domain(self, action, payload={}):
-        unraid = self.unraid
+        unraid = self.__unraid
 
         payload = {**{
             'action': action,

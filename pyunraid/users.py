@@ -24,7 +24,7 @@ def _users(unraid):
         # Find image
         u.image = user.find('img')['src']
 
-        u._unraid = unraid
+        u._set_unraid(unraid)
 
         users.append(u)
 

@@ -18,7 +18,7 @@ def _notifications(unraid):
         notification.importance = n['importance']
         notification.file = n['file']
 
-        notification.unraid = unraid
+        notification._set_unraid(unraid)
 
         notifications.append(notification)
 

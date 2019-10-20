@@ -16,14 +16,17 @@ class Notification():
         self.description = ''
         self.importance = ''
         self.file = ''
-        self.unraid = None
+        self.__unraid = None
 
     def dismiss(self):
         """Dismiss the notification.
 
         :returns: void
         """
-        self.unraid.post(
+        self.__unraid.post(
             '/webGui/include/Notify.php',
             {'cmd': 'archive', 'file': self.file}
         )
+
+    def _set_unraid(self, unraid):
+        self.__unraid = unraid

@@ -27,7 +27,7 @@ class Share():
         self.nfs_security = ''
         self.afp_security = None
         self.free_size = 0
-        self._unraid = None
+        self.__unraid = None
 
     def _compute_size(self):
         """Compute the size in bytes of the share.
@@ -48,7 +48,7 @@ class Share():
         old_name = self.name
         self.name = name
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'shareNameOrig': old_name,
@@ -64,7 +64,7 @@ class Share():
         """
         self.comment = comment
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'shareComment': comment,
@@ -78,7 +78,7 @@ class Share():
         :param comment: The new comment.
         """
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'shareAllocator': method,
@@ -92,7 +92,7 @@ class Share():
         :param floor: Minimum free space in bytes
         """
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'shareFloor': floor,
@@ -107,7 +107,7 @@ class Share():
         only split top level dir and 0 is no splitting.
         """
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'shareSplitLevel': split,
@@ -127,7 +127,7 @@ class Share():
         :param use_cache: 'yes' for yes and 'no' for no
         """
 
-        return self._unraid.post(
+        return self.__unraid.post(
             '/update.htm',
             {
                 'shareUseCache': use_cache,
@@ -156,6 +156,9 @@ class Share():
         return self._parse_directory(table)
 
     # Internal functions
+    def _set_unraid(self, unraid):
+        self.__unraid = unraid
+
     def _parse_directory(self, table):
         """Internal function to parse path directory table."""
         path = []

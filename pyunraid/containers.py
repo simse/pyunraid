@@ -118,7 +118,7 @@ def _containers(u):
         # Find Dockerhub url
         c.dockerhub_url = container.find_all('a')[1]['href']
 
-        c.unraid = u
+        c._set_unraid(u)
 
         containers.append(c)
 
