@@ -8,8 +8,9 @@ from pyunraid.models.container import Container
 def _containers(u):
     # Parse containers page
     soup = BeautifulSoup(
-        u.get('/plugins/dynamix.docker.manager/include/ \
-            DockerContainers.php').text,
+        u.get(
+            '/plugins/dynamix.docker.manager/include/DockerContainers.php'
+        ).text,
         'lxml'
     )
     containers = []

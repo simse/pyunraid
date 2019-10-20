@@ -11,8 +11,9 @@ PLUGIN_UPDATE_STATUS = {
 def _plugins(u):
     # Parse containers page
     soup = BeautifulSoup(
-        u.get('/plugins/dynamix.plugin.manager/include/ShowPlugins.php \
-            ?check=1').text,
+        u.get(
+            '/plugins/dynamix.plugin.manager/include/ShowPlugins.php?check=1'
+        ).text,
         'lxml'
     )
     plugins = []
