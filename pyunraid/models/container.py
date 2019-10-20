@@ -16,8 +16,8 @@ class Container():
     :ivar port_mappings: Array of port mappings (e.g. [['5050', '5000'], ['80', '81']])
     :ivar path_mappings: Array of path mappings (e.g. [['/chronos', '/mnt/user/appdata/chronos']])
     :ivar startup_delay: Startup delay for the container
-    :ivar uptime: Uptime in minutes
-    :ivar age: Age in minutes
+    :ivar uptime: Uptime in hours
+    :ivar age: Age in hours
     """
 
     def __init__(self):

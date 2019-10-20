@@ -96,6 +96,84 @@ class Unraid:
         # Find array status
         self.array_status = ARRAY_STATUS[server_page.find(id="statusbar").text.strip()]
 
+    def get_disk(self, identification):
+        """Get a single Disk object given identification.
+
+        :param identification: The identification of the disk
+        (e.g. WDC_WD80EMAZ-00WJTA0_7HKRY8MJ)
+        """
+        disks = self.disks()
+
+        for disk in disks:
+            if disk.identification == identification:
+                return disk
+
+        return None
+
+    def get_container(self, id):
+        """Get a single Container object given image ID.
+
+        :param id: The ID of the container image (e.g. 0d70980cf126)
+        """
+        containers = self.containers()
+
+        for container in containers:
+            if container.id == id:
+                return container
+
+        return None
+
+    def get_vm(self, name):
+        """Get a single VM object given name.
+
+        :param name: The name of the VM (e.g. Windows 10 Gaming Machine)
+        """
+        vms = self.vms()
+
+        for vm in vms:
+            if vm.name == name:
+                return vm
+
+        return None
+
+    def get_share(self, name):
+        """Get a single Share object given name.
+
+        :param name: The name of the Share (e.g. appdata)
+        """
+        shares = self.shares()
+
+        for share in shares:
+            if share.name == name:
+                return share
+
+        return None
+
+    def get_user(self, name):
+        """Get a single User object given name.
+
+        :param name: The name of the User (e.g. simon)
+        """
+        users = self.users()
+
+        for user in users:
+            if user.name == name:
+                return user
+
+        return None
+
+    def get_plugin(self, name):
+        """Get a single Plugin object given name.
+
+        :param name: The name of the PLugin (e.g. Fix Common Problems)
+        """
+        plugins = self.plugins()
+
+        for plugin in plugins:
+            if plugin.name == name:
+                return plugin
+
+        return None
 
     def disks(self):
         """Get a list of :class:`disks <pyunraid.models.disk>` connected to the server."""
