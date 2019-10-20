@@ -2,8 +2,10 @@ import base64
 import ntpath
 from os import path
 
+from .model import Model
 
-class User():
+
+class User(Model):
     """The User class represents a user on the Unraid server
 
     :ivar name: The name of the user

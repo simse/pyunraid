@@ -103,7 +103,7 @@ class Unraid:
             server_page.find(id="statusbar").text.strip()
         ]
 
-    def get_disk(self, identification):
+    def get_disk(self, identification, sanitize=False):
         """Get a single Disk object given identification.
 
         :param identification: The identification of the disk
@@ -113,11 +113,14 @@ class Unraid:
 
         for disk in disks:
             if disk.identification == identification:
+                if sanitize:
+                    return disk.to_dict()
+
                 return disk
 
         return None
 
-    def get_container(self, id):
+    def get_container(self, id, sanitize=False):
         """Get a single Container object given image ID.
 
         :param id: The ID of the container image (e.g. 0d70980cf126)
@@ -126,11 +129,14 @@ class Unraid:
 
         for container in containers:
             if container.id == id:
+                if sanitize:
+                    return container.to_dict()
+
                 return container
 
         return None
 
-    def get_vm(self, name):
+    def get_vm(self, name, sanitize=False):
         """Get a single VM object given name.
 
         :param name: The name of the VM (e.g. Windows 10 Gaming Machine)
@@ -139,11 +145,14 @@ class Unraid:
 
         for vm in vms:
             if vm.name == name:
+                if sanitize:
+                    return vm.to_dict()
+
                 return vm
 
         return None
 
-    def get_share(self, name):
+    def get_share(self, name, sanitize=False):
         """Get a single Share object given name.
 
         :param name: The name of the Share (e.g. appdata)
@@ -152,11 +161,14 @@ class Unraid:
 
         for share in shares:
             if share.name == name:
+                if sanitize:
+                    return share.to_dict()
+
                 return share
 
         return None
 
-    def get_user(self, name):
+    def get_user(self, name, sanitize=False):
         """Get a single User object given name.
 
         :param name: The name of the User (e.g. simon)
@@ -165,11 +177,14 @@ class Unraid:
 
         for user in users:
             if user.name == name:
+                if sanitize:
+                    return user.to_dict()
+
                 return user
 
         return None
 
-    def get_plugin(self, name):
+    def get_plugin(self, name, sanitize=False):
         """Get a single Plugin object given name.
 
         :param name: The name of the PLugin (e.g. Fix Common Problems)
@@ -178,69 +193,93 @@ class Unraid:
 
         for plugin in plugins:
             if plugin.name == name:
+                if sanitize:
+                    return plugin.to_dict()
+
                 return plugin
 
         return None
 
-    def disks(self):
+    def disks(self, sanitize=False):
         """Get a list of :class:`disks <pyunraid.models.disk>` connected to
         the server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
+        if sanitize:
+            return [d.to_dict() for d in _disks(self)]
+
         return _disks(self)
 
-    def containers(self):
+    def containers(self, sanitize=False):
         """Get a list of :class:`containers <pyunraid.models.container>`
         running on the server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
+        if sanitize:
+            return [d.to_dict() for d in _containers(self)]
+
         return _containers(self)
 
-    def vms(self):
+    def vms(self, sanitize=False):
         """Get a list of :class:`VMs <pyunraid.models.vm>` running on the
         server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
+        if sanitize:
+            return [d.to_dict() for d in _vms(self)]
+
         return _vms(self)
 
-    def shares(self):
+    def shares(self, sanitize=False):
         """Get a list of :class:`shares <pyunraid.models.share>` on the
         server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
+        if sanitize:
+            return [d.to_dict() for d in _shares(self)]
+
         return _shares(self)
 
-    def users(self):
+    def users(self, sanitize=False):
         """Get a list of :class:`users <pyunraid.models.user>` on the
         server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
+        if sanitize:
+            return [d.to_dict() for d in _users(self)]
+
         return _users(self)
 
-    def plugins(self):
+    def plugins(self, sanitize=False):
         """Get a list of :class:`plugins <pyunraid.models.plugin>` on the
         server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
 
+        if sanitize:
+            return [d.to_dict() for d in _plugins(self)]
+
         return _plugins(self)
 
-    def notifications(self):
+    def notifications(self, sanitize=False):
         """Get a list of :class:`notifications <pyunraid.models.notification>`
         on the server.
         """
         if self.array_status in ['STOPPING', 'STOPPED']:
             return []
+
+        if sanitize:
+            return [d.to_dict() for d in _notifications(self)]
 
         return _notifications(self)

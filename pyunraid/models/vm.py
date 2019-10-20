@@ -1,4 +1,7 @@
-class VM:
+from .model import Model
+
+
+class VM(Model):
     """The VM class represents a VM on the Unraid server.
 
     :ivar uuid: The UUID of the VM

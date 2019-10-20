@@ -1,9 +1,10 @@
 from bs4 import BeautifulSoup
 
 from pyunraid.helpers import parse_size
+from .model import Model
 
 
-class Share():
+class Share(Model):
     """The Share class represents a share on the Unraid server.
 
     :ivar type: User share or disk share

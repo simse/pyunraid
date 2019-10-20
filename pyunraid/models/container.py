@@ -1,4 +1,7 @@
-class Container():
+from .model import Model
+
+
+class Container(Model):
     """
     Represents a Docker container on the Unraid server.
 

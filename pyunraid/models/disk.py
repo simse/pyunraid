@@ -1,4 +1,7 @@
-class Disk():
+from .model import Model
+
+
+class Disk(Model):
     """The Disk class represents a harddrive, SSD or flash drive connected to
     the Unraid server
 

@@ -1,4 +1,7 @@
-class Plugin():
+from .model import Model
+
+
+class Plugin(Model):
     """The Plugin class represents a plugin on the Unraid server
 
     :ivar name: The name of the plugin

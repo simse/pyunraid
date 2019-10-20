@@ -1,4 +1,7 @@
-class Notification():
+from .model import Model
+
+
+class Notification(Model):
     """The Notification class represents a notification on the Unraid server
 
     :ivar timestamp: The timestamp of the notification (e.g. 19-10-2019 00:26)
