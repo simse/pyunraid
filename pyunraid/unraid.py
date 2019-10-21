@@ -120,15 +120,16 @@ class Unraid:
 
         return None
 
-    def get_container(self, id, sanitize=False):
+    def get_container(self, id='', name='', sanitize=False):
         """Get a single Container object given image ID.
 
         :param id: The ID of the container image (e.g. 0d70980cf126)
+        :param name: The name of the container
         """
         containers = self.containers()
 
         for container in containers:
-            if container.id == id:
+            if container.id == id or container.name == name:
                 if sanitize:
                     return container.to_dict()
 
