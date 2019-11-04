@@ -14,9 +14,15 @@
         </div>
 
         <div class="container code">
-            <pre><code class="language-python">import TV from pymitv
-tv = TV('192.168.0.32')
-tv.turn_on()</code></pre>
+            <pre><code class="language-python">
+from pyunraid import Unraid
+
+# Create Unraid server object
+unraid = Unraid('192.168.1.4', 'root', 'your-secure-password')
+
+# Get all Docker containers
+containers = unraid.containers()
+</code></pre>
         </div>
 
         <div class="container get-started">
@@ -36,7 +42,7 @@ tv.turn_on()</code></pre>
                     <div class="step-content">
                 
                         <p>
-                    To install, open your command line and pop in the following: <code>pip install pymitv</code>.
+                    To install, open your command line and pop in the following: <code>pip install pyunraid</code>.
                 </p>
                 
                     </div>
