@@ -8,3 +8,6 @@ pyunraid.egg-info
 docs/_build
 web/docs
 image.png
+node_modules
+public
+*.pyc
