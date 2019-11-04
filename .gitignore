@@ -9,3 +9,4 @@ docs/_build
 web/docs
 node_modules
 public
+*.pyc
