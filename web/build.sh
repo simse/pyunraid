@@ -6,4 +6,4 @@ npm install
 brunch build --production
 mkdir public
 mkdir public/docs
-cp -r ../docs/_build/html public/docs
+cp -r ../docs/_build/html/* public/docs
