@@ -7,3 +7,5 @@ dist
 pyunraid.egg-info
 docs/_build
 web/docs
+node_modules
+public
